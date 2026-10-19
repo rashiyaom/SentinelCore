@@ -115,10 +115,25 @@ Edit `.env` and set at minimum:
 - `PROTECTED_IPS` — your gateway and DNS server; these plus the platform's
   own host IP can never be firewall-blocked (M10), no matter what.
 
-Then:
+Then start the complete local stack from the repository root:
 
 ```bash
-docker compose up --build
+npm run dev
+```
+
+This one command starts Docker Desktop when needed, launches PostgreSQL,
+Redis, the privileged helper, API, pipeline worker, frontend, and nginx,
+waits for the website to become ready, then opens both
+**http://localhost/** and the GitHub repository. Pressing `Ctrl+C` stops the
+log view but leaves the services running.
+
+Useful development commands:
+
+```bash
+npm run dev:status  # show every service
+npm run dev:logs    # follow all service logs
+npm run dev:stop    # stop the complete stack
+npm run build       # production frontend build
 ```
 
 On first boot the backend seeds a bootstrap admin account

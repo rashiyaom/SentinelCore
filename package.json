@@ -1,0 +1,13 @@
+{
+  "name": "sentinelcore",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SentinelCore local development launcher",
+  "scripts": {
+    "dev": "node backend/scripts/dev.mjs start",
+    "dev:stop": "node backend/scripts/dev.mjs stop",
+    "dev:status": "node backend/scripts/dev.mjs status",
+    "dev:logs": "node backend/scripts/dev.mjs logs",
+    "build": "npm --prefix frontend run build"
+  }
+}
