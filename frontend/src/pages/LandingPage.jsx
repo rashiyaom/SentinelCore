@@ -18,7 +18,6 @@ import {
   ScanSearch,
   Shield,
   ShieldCheck,
-  Sparkles,
   X,
   Zap,
 } from "lucide-react";
@@ -59,49 +58,73 @@ const operationSlides = [
     icon: Radar,
     number: "01",
     label: "Inventory",
+    accent: "#5eead4",
+    soft: "rgba(94, 234, 212, .14)",
     title: "Discover what belongs",
     text: "Scan an authorized network, identify hosts and services, and keep a living asset record instead of a forgotten spreadsheet.",
     detail: "Assets · Ports · Scan history",
+    metric: "24",
+    metricLabel: "devices mapped",
   },
   {
     icon: ScanSearch,
     number: "02",
     label: "Detection",
+    accent: "#60a5fa",
+    soft: "rgba(96, 165, 250, .14)",
     title: "Turn packets into signal",
     text: "Suricata rules inspect traffic while sensor health, throughput, and rule sources stay visible from one workspace.",
     detail: "Sensor · Rules · EVE events",
+    metric: "Live",
+    metricLabel: "packet inspection",
   },
   {
     icon: Database,
     number: "03",
     label: "Evidence",
+    accent: "#c084fc",
+    soft: "rgba(192, 132, 252, .14)",
     title: "Search without losing context",
     text: "Filter events by time, severity, protocol, signature, or address and return to useful investigations with saved searches.",
     detail: "Facets · Keyset search · Saved views",
+    metric: "<80ms",
+    metricLabel: "event lookup",
   },
   {
     icon: GitBranch,
     number: "04",
     label: "Correlation",
+    accent: "#f472b6",
+    soft: "rgba(244, 114, 182, .14)",
     title: "Connect the quiet clues",
     text: "Rules group threshold, sequence, rare, and beacon-like behavior into candidates that explain why they were created.",
     detail: "Rules · Candidates · Run history",
+    metric: "4→1",
+    metricLabel: "signals connected",
   },
   {
     icon: FileSearch,
     number: "05",
     label: "Investigation",
+    accent: "#fb923c",
+    soft: "rgba(251, 146, 60, .14)",
     title: "Work the incident, not the noise",
     text: "Promote candidates, attach evidence, assign ownership, record decisions, and keep every state change in the timeline.",
     detail: "Triage · Evidence · History",
+    metric: "01",
+    metricLabel: "shared timeline",
   },
   {
     icon: ShieldCheck,
     number: "06",
     label: "Response",
+    accent: "#a3e635",
+    soft: "rgba(163, 230, 53, .14)",
     title: "Contain with a way back",
     text: "Apply time-limited blocks with protected-address checks, then export the evidence as a report for review.",
     detail: "TTL blocks · Audit · Reports",
+    metric: "30m",
+    metricLabel: "automatic rollback",
   },
 ];
 
@@ -159,16 +182,6 @@ const questions = [
 
 const WORDMARK_LETTERS = ["S", "e", "c", "u", "r", "e", "H"];
 const WORDMARK_TAIL = ["m", "e"];
-const O_BITS = [
-  ["0", "50%", "4%"],
-  ["1", "82%", "18%"],
-  ["0", "96%", "50%"],
-  ["1", "82%", "82%"],
-  ["1", "50%", "96%"],
-  ["0", "18%", "82%"],
-  ["1", "4%", "50%"],
-  ["0", "18%", "18%"],
-];
 
 function PixelWordmark({ visible }) {
   return (
@@ -177,13 +190,9 @@ function PixelWordmark({ visible }) {
         {WORDMARK_LETTERS.map((letter, index) => (
           <span key={`${letter}-${index}`} className="video-wordmark-letter" style={{ "--letter-delay": `${index * 55}ms` }}>{letter}</span>
         ))}
-        <span className="pixel-o" style={{ "--letter-delay": "385ms" }}>
-          <span className="pixel-o-core" />
-          <span className="pixel-o-orbit">
-            {O_BITS.map(([bit, x, y], index) => (
-              <i key={`${bit}-${index}`} style={{ "--bit-x": x, "--bit-y": y, "--bit-delay": `${520 + index * 65}ms` }}>{bit}</i>
-            ))}
-          </span>
+        <span className="soft-o" style={{ "--letter-delay": "385ms" }}>
+          <span className="soft-o-ring" />
+          <span className="soft-o-glint" />
         </span>
         {WORDMARK_TAIL.map((letter, index) => (
           <span key={`${letter}-${index}`} className="video-wordmark-letter" style={{ "--letter-delay": `${460 + index * 55}ms` }}>{letter}</span>
@@ -278,9 +287,9 @@ function Brand() {
 
 function ConsolePreview() {
   return (
-    <div className="relative mx-auto w-full max-w-[610px] lg:ml-auto">
-      <div className="absolute -inset-8 bg-violet-500/10 blur-3xl" aria-hidden="true" />
-      <div className="relative overflow-hidden border border-white/15 bg-[#111118] shadow-2xl shadow-black/50">
+    <div className="console-preview relative mx-auto w-full max-w-[610px] lg:ml-auto">
+      <div className="console-halo absolute -inset-8 blur-3xl" aria-hidden="true" />
+      <div className="console-frame relative overflow-hidden border border-white/15 bg-[#111118] shadow-2xl shadow-black/50">
         <div className="flex h-11 items-center gap-2 border-b border-white/10 px-4">
           <span className="h-2 w-2 bg-rose-400" />
           <span className="h-2 w-2 bg-amber-300" />
@@ -400,100 +409,75 @@ function SpotlightCapability({ icon: Icon, index, title, text }) {
 }
 
 function OperationsCarousel() {
-  const viewportRef = useRef(null);
-  const dragRef = useRef({ active: false, startX: 0, scrollLeft: 0, moved: false });
   const [active, setActive] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const slide = operationSlides[active];
+  const SlideIcon = slide.icon;
 
-  const goTo = (index) => {
-    const viewport = viewportRef.current;
-    if (!viewport) return;
-    const normalized = (index + operationSlides.length) % operationSlides.length;
-    const card = viewport.children[normalized];
-    viewport.scrollTo({ left: card.offsetLeft - viewport.offsetLeft, behavior: "smooth" });
-    setActive(normalized);
-  };
-
-  useEffect(() => {
-    if (paused) return undefined;
-    const timer = window.setInterval(() => goTo(active + 1), 5200);
-    return () => window.clearInterval(timer);
-  }, [active, paused]);
-
-  const updateActive = () => {
-    const viewport = viewportRef.current;
-    if (!viewport) return;
-    const center = viewport.scrollLeft + viewport.clientWidth / 2;
-    let nearest = 0;
-    let distance = Number.POSITIVE_INFINITY;
-    Array.from(viewport.children).forEach((child, index) => {
-      const childCenter = child.offsetLeft + child.clientWidth / 2;
-      const nextDistance = Math.abs(center - childCenter);
-      if (nextDistance < distance) {
-        distance = nextDistance;
-        nearest = index;
-      }
-    });
-    setActive(nearest);
-  };
-
-  const startDrag = (event) => {
-    if (event.pointerType !== "mouse") return;
-    const viewport = viewportRef.current;
-    dragRef.current = { active: true, startX: event.clientX, scrollLeft: viewport.scrollLeft, moved: false };
-    viewport.setPointerCapture(event.pointerId);
-    viewport.classList.add("is-dragging");
-  };
-
-  const drag = (event) => {
-    if (!dragRef.current.active) return;
-    const distance = event.clientX - dragRef.current.startX;
-    if (Math.abs(distance) > 4) dragRef.current.moved = true;
-    viewportRef.current.scrollLeft = dragRef.current.scrollLeft - distance;
-  };
-
-  const endDrag = (event) => {
-    if (!dragRef.current.active) return;
-    dragRef.current.active = false;
-    viewportRef.current.classList.remove("is-dragging");
-    if (viewportRef.current.hasPointerCapture(event.pointerId)) viewportRef.current.releasePointerCapture(event.pointerId);
-    updateActive();
-  };
+  const goTo = (index) => setActive((index + operationSlides.length) % operationSlides.length);
 
   return (
-    <div className="operations-carousel" onPointerEnter={() => setPaused(true)} onPointerLeave={() => setPaused(false)}>
-      <div
-        ref={viewportRef}
-        className="operations-viewport"
-        onScroll={() => window.requestAnimationFrame(updateActive)}
-        onPointerDown={startDrag}
-        onPointerMove={drag}
-        onPointerUp={endDrag}
-        onPointerCancel={endDrag}
-      >
-        {operationSlides.map(({ icon: Icon, number, label, title, text, detail }, index) => (
-          <article key={title} className={`operation-slide ${active === index ? "is-active" : ""}`}>
-            <div className="operation-slide-top">
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/35">// {number} · {label}</span>
-              <span className="operation-slide-icon"><Icon size={26} strokeWidth={1.4} /></span>
-            </div>
-            <div className="operation-orbit" aria-hidden="true"><i /><i /><i /></div>
-            <div className="relative z-10 mt-auto">
-              <h3>{title}</h3>
-              <p>{text}</p>
-              <span className="operation-detail">{detail}</span>
-            </div>
-          </article>
+    <div className="operations-showcase" style={{ "--module-accent": slide.accent, "--module-soft": slide.soft }}>
+      <div className="operations-rail" role="tablist" aria-label="Platform modules">
+        {operationSlides.map(({ icon: Icon, number, label, accent }, index) => (
+          <button
+            key={label}
+            type="button"
+            role="tab"
+            aria-selected={active === index}
+            onClick={() => setActive(index)}
+            style={{ "--item-accent": accent }}
+          >
+            <span className="operations-rail-number">{number}</span>
+            <span className="operations-rail-icon"><Icon size={17} strokeWidth={1.6} /></span>
+            <strong>{label}</strong>
+            <ChevronRight size={15} className="operations-rail-arrow" />
+          </button>
         ))}
       </div>
-      <div className="operations-controls">
-        <span className="operations-count">{String(active + 1).padStart(2, "0")} / {String(operationSlides.length).padStart(2, "0")}</span>
-        <div className="operations-progress" aria-hidden="true"><span style={{ width: `${((active + 1) / operationSlides.length) * 100}%` }} /></div>
-        <div className="flex gap-2">
-          <button type="button" onClick={() => goTo(active - 1)} aria-label="Previous platform capability"><ArrowLeft size={17} /></button>
-          <button type="button" onClick={() => goTo(active + 1)} aria-label="Next platform capability"><ArrowRight size={17} /></button>
+
+      <article className="operation-focus" role="tabpanel" key={slide.number}>
+        <div className="operation-focus-glow" aria-hidden="true" />
+        <div className="operation-focus-grid" aria-hidden="true" />
+        <div className="operation-focus-top">
+          <span>{slide.number} / {String(operationSlides.length).padStart(2, "0")}</span>
+          <span className="operation-focus-live"><i /> Context preserved</span>
         </div>
-      </div>
+
+        <div className="operation-focus-body">
+          <div className="operation-focus-copy">
+            <span className="operation-focus-icon"><SlideIcon size={30} strokeWidth={1.35} /></span>
+            <p className="operation-focus-label">{slide.label}</p>
+            <h3>{slide.title}</h3>
+            <p className="operation-focus-text">{slide.text}</p>
+            <div className="operation-focus-tags">
+              {slide.detail.split(" · ").map((item) => <span key={item}>{item}</span>)}
+            </div>
+          </div>
+
+          <div className="operation-visual" aria-hidden="true">
+            <div className="operation-radar">
+              <span className="operation-radar-sweep" />
+              <i /><i /><i /><i />
+              <div><SlideIcon size={25} strokeWidth={1.35} /></div>
+            </div>
+            <div className="operation-metric">
+              <strong>{slide.metric}</strong>
+              <span>{slide.metricLabel}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="operation-focus-footer">
+          <div className="operation-step-line" aria-hidden="true">
+            {operationSlides.map((item, index) => <i key={item.number} className={index <= active ? "is-reached" : ""} />)}
+          </div>
+          <div className="operation-focus-controls">
+            <span>No autoplay · choose your path</span>
+            <button type="button" onClick={() => goTo(active - 1)} aria-label="Previous module"><ArrowLeft size={17} /></button>
+            <button type="button" onClick={() => goTo(active + 1)} aria-label="Next module"><ArrowRight size={17} /></button>
+          </div>
+        </div>
+      </article>
     </div>
   );
 }
@@ -619,33 +603,42 @@ export default function LandingPage() {
       </header>
 
       <main>
-        <section className="landing-grid relative border-b border-white/10">
-          <div className="mx-auto grid min-h-[760px] max-w-[1240px] items-center gap-14 px-5 py-20 sm:px-8 lg:grid-cols-[.9fr_1.1fr] lg:py-28">
-            <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 border border-violet-400/25 bg-violet-400/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-violet-300">
-                <Sparkles size={12} /> Network defense, made legible
+        <section className="landing-hero relative border-b border-white/10">
+          <div className="hero-aurora" aria-hidden="true"><i /><i /><i /></div>
+          <div className="mx-auto grid min-h-[780px] max-w-[1320px] items-center gap-16 px-5 py-20 sm:px-8 lg:grid-cols-[.9fr_1.1fr] lg:py-28">
+            <div className="hero-copy relative z-10">
+              <div className="hero-eyebrow">
+                <span className="hero-eyebrow-mark"><ShieldCheck size={13} /></span>
+                <span>Clarity for every signal</span>
+                <i />
+                <span className="text-emerald-200/80">System online</span>
               </div>
-              <h1 className="mt-7 max-w-3xl text-[clamp(3rem,7vw,6.5rem)] font-semibold leading-[0.9] tracking-[-0.065em]">
-                Know what’s on your network. <span className="block text-violet-400">Act on what matters.</span>
+              <h1 className="hero-title">
+                See your network
+                <span>with quiet confidence.</span>
               </h1>
-              <p className="mt-7 max-w-xl text-base leading-7 text-white/55 sm:text-lg">
-                SentinelCore brings device discovery, explainable detection, incident triage, and guarded response into one focused workspace.
+              <p className="hero-lede">
+                Discover every device, understand what changed, and move from evidence to a safe response—without fighting the interface.
               </p>
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                <Link to="/login" className="group inline-flex items-center justify-center gap-2 bg-violet-400 px-6 py-3.5 text-sm font-semibold text-[#101016] transition hover:bg-violet-300">
+              <div className="hero-actions">
+                <Link to="/login" className="hero-primary group">
                   Enter secure console <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
                 </Link>
-                <a href="#platform" className="inline-flex items-center justify-center gap-2 border border-white/15 px-6 py-3.5 text-sm font-medium text-white/75 transition hover:border-white/30 hover:bg-white/5 hover:text-white">
+                <a href="#platform" className="hero-secondary">
                   Explore the platform <ChevronRight size={16} />
                 </a>
               </div>
-              <div className="mt-8 flex flex-wrap gap-x-5 gap-y-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white/35">
-                <span className="flex items-center gap-1.5"><Check size={12} className="text-emerald-300" /> Single-host deployment</span>
-                <span className="flex items-center gap-1.5"><Check size={12} className="text-emerald-300" /> Role-based access</span>
-                <span className="flex items-center gap-1.5"><Check size={12} className="text-emerald-300" /> Traceable detections</span>
+              <div className="hero-proof">
+                <span><Check size={13} /> Self-hosted</span>
+                <span><Check size={13} /> Explainable</span>
+                <span><Check size={13} /> Reversible actions</span>
               </div>
             </div>
-            <ConsolePreview />
+            <div className="hero-console-wrap">
+              <span className="hero-float hero-float-top"><i /> 24 devices known</span>
+              <ConsolePreview />
+              <span className="hero-float hero-float-bottom"><ShieldCheck size={14} /> Protected by design</span>
+            </div>
           </div>
         </section>
 
@@ -678,7 +671,7 @@ export default function LandingPage() {
                 <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-violet-300">[ 02 / Modules ]</p>
                 <h2 className="mt-5 max-w-3xl text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl">One connected system. Six clear moves.</h2>
               </div>
-              <p className="max-w-xl text-sm leading-6 text-white/45 lg:ml-auto">Drag, swipe, or use the controls to explore the operational path. Every module passes context forward instead of starting the investigation over.</p>
+              <p className="max-w-xl text-sm leading-6 text-white/45 lg:ml-auto">Choose a module to explore the operational path. Nothing moves without you; every stage passes its context forward instead of restarting the investigation.</p>
             </div>
             <OperationsCarousel />
           </div>
