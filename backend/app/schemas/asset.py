@@ -14,7 +14,7 @@ from app.models.scan import ScanStatus, ScanType
 
 MAX_TARGETS = 64
 
-# Mirrors the helper's grammar in helper/helper/validation.py. Kept in sync
+# Mirrors the helper's grammar in backend/helper/helper/validation.py. Kept in sync
 # deliberately rather than shared: the helper must never depend on backend code,
 # since its whole job is to distrust the backend.
 _PORT_SPEC_RE = re.compile(r"\A\d{1,5}(-\d{1,5})?(,\d{1,5}(-\d{1,5})?)*\Z")

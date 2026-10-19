@@ -1,6 +1,6 @@
 """API-layer scan request validation.
 
-This is the *first* of two independent checks. `helper/tests/test_validation.py`
+This is the *first* of two independent checks. `backend/helper/tests/test_validation.py`
 covers the second — the helper refuses the same inputs even when this layer is
 bypassed entirely, which is the M3 requirement.
 """

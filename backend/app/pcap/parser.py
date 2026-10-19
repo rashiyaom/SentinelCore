@@ -10,7 +10,7 @@ bounds a dissector exploit to "code execution as `appuser` inside the
 backend container", not "code execution as the process that can rewrite
 iptables rules or read every other container's traffic." The isolation is
 enforced by containment (no root, no `NET_ADMIN`, no socket to the helper),
-not by a separate container — see `updates/U03-pcap-parser-isolation.md`
+not by a separate container — see `reports/updates/U03-pcap-parser-isolation.md`
 for the full analysis and the alternative (a dedicated `pcap-worker`
 service) that was considered and deferred.
 

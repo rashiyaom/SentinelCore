@@ -13,7 +13,7 @@ explicitly rather than hoped about:
                                st_size < offset; seek back to 0.
 
 Both are handled, so either rotation strategy is safe (see
-docker/suricata/logrotate.conf).
+backend/deployment/suricata/logrotate.conf).
 """
 
 from __future__ import annotations

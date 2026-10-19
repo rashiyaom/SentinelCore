@@ -21,7 +21,7 @@ M9 Reporting → M10 Firewall → M11 PCAP → M12 Threat Intel
   absolute resolved binary paths, no network name-resolution (`-n`),
   wall-clock timeout, CPU/address-space rlimits, runs as the unprivileged
   `appuser` — never the helper. Enforced by
-  `backend/tests/test_no_subprocess.py`. See U03 in `updates/` for why
+  `backend/tests/test_no_subprocess.py`. See U03 in `reports/updates/` for why
   this is not routed through the helper: PCAPs are attacker-controlled
   input and tshark dissectors have a long CVE history, so parsing them
   inside the one root-capable component would be the worst place for it.
@@ -43,9 +43,9 @@ M9 Reporting → M10 Firewall → M11 PCAP → M12 Threat Intel
 - All firewall rules have mandatory TTL
 - Firewall rules are applied via `iptables` on the kernel's nftables backend
   (`iptables-nft`) — Ubuntu/Debian 24.04's default `iptables` binary; confirm
-  with `iptables --version` (reports `(nf_tables)`). `helper/helper/ops/firewall.py`
-  and `helper/helper/config.py` document this. Same wording used in README.md
-  and TEST_REPORT.md — do not drift.
+  with `iptables --version` (reports `(nf_tables)`). `backend/helper/helper/ops/firewall.py`
+  and `backend/helper/helper/config.py` document this. Same wording used in README.md
+  and `reports/testing/TEST_REPORT.md` — do not drift.
 
 ## Database Tables
 users, assets, asset_ports, events, incidents,

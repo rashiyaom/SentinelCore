@@ -8,7 +8,7 @@ The second check needs the full repository checked out to mean anything —
 inside the backend Docker image only `backend/` exists, so when this test
 runs there it can only see `backend/`. In CI (`pytest backend` against a
 full `git checkout`, see `.github/workflows/ci.yml`) it covers the whole
-tree, including `helper/`, `privileged-helper/`, `frontend/`, `docker/`.
+tree, including `backend/helper/`, `frontend/`, and deployment configuration.
 Either way the guard degrades to "covers what's on disk", never to "skipped".
 """
 
@@ -26,7 +26,7 @@ _ALLOWED_SUBPROCESS_FILE = Path("app/pcap/parser.py")
 # that are not our code to police.
 _EXCLUDE_DIR_PARTS = {
     ".git", "node_modules", "__pycache__", ".pytest_cache", "venv", ".venv",
-    "updates", "Modules", "dist", "build",
+    "updates", "modules", "dist", "build",
 }
 
 

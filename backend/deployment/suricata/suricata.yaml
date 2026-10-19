@@ -50,7 +50,7 @@ outputs:
       filetype: regular
       filename: eve.json
       # Rotation is handled externally by logrotate with `copytruncate`
-      # (see docker/suricata/logrotate.conf). M5's tailer tracks (st_dev,
+      # (see backend/deployment/suricata/logrotate.conf). M5's tailer tracks (st_dev,
       # st_ino) and also detects truncation, so it survives either mechanism.
       rotate-interval: day
       pcap-file: false

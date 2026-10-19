@@ -60,7 +60,7 @@ services:
   # `privileged: true`, which would grant everything.
   helper:
     build:
-      context: ./helper
+      context: ./backend/helper
     env_file: .env
     cap_drop:
       - ALL
@@ -80,7 +80,7 @@ services:
       - rule_staging:/var/lib/sentinelcore/staging
       - suricata_logs:/var/log/suricata
       - suricata_run:/var/run/suricata
-      - ./docker/suricata/suricata.yaml:/etc/suricata/suricata.yaml:ro
+      - ./backend/deployment/suricata/suricata.yaml:/etc/suricata/suricata.yaml:ro
     restart: unless-stopped
     # host networking is required for discovery AND for Suricata to see real
     # traffic: nmap needs a route to the monitored LAN, the ARP sweep needs its
@@ -180,7 +180,7 @@ services:
   nginx:
     image: nginx:1.27-alpine
     volumes:
-      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./backend/deployment/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
       - "80:80"
     depends_on:

@@ -31,7 +31,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
 
 COPY . .
 
-# GID 2000 must match the `sentinelcore` group in helper/Dockerfile — that is
+# GID 2000 must match the `sentinelcore` group in backend/helper/Dockerfile — that is
 # what grants this container access to the 0660 root:sentinelcore helper
 # socket. Group membership is the whole authorization mechanism here.
 RUN groupadd -g 2000 sentinelcore \

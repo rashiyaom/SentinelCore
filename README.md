@@ -7,7 +7,7 @@
 [![Backend](https://img.shields.io/badge/backend-FastAPI-009688?logo=fastapi&logoColor=white)](backend)
 [![Frontend](https://img.shields.io/badge/frontend-React%20%2B%20Tailwind-61DAFB?logo=react&logoColor=white)](frontend)
 [![Database](https://img.shields.io/badge/database-PostgreSQL-4169E1?logo=postgresql&logoColor=white)](docker-compose.yml)
-[![Sensor](https://img.shields.io/badge/sensor-Suricata-EE0000)](Modules/M04-suricata-sensor_1.md)
+[![Sensor](https://img.shields.io/badge/sensor-Suricata-EE0000)](reports/modules/M04-suricata-sensor_1.md)
 [![Deploy](https://img.shields.io/badge/deploy-Docker%20Compose-2496ED?logo=docker&logoColor=white)](docker-compose.yml)
 [![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-lightgrey)](#10-team-mentors-licence)
 
@@ -80,7 +80,7 @@ flowchart LR
   events into `incidents` an analyst triages.
 - **pcap path**: uploaded captures are parsed by `tshark`/`capinfos` inside
   the unprivileged backend itself (not the helper) — see
-  `backend/app/pcap/parser.py` and `updates/U03-pcap-parser-isolation.md`
+  `backend/app/pcap/parser.py` and `reports/updates/U03-pcap-parser-isolation.md`
   for why.
 
 ---
@@ -153,20 +153,20 @@ Docker network and not published to the host.
 | M0 | Infrastructure: Docker Compose skeleton, Postgres, Redis, the privileged-helper container and its capability split. |
 | M1 | Auth/RBAC: Argon2 password hashing, JWT access/refresh tokens, the three-role model, login throttling. |
 | M2 | App shell: React/Tailwind frontend skeleton, routing, role-aware navigation. |
-| [M3](Modules/M03-asset-discovery_1.md) | Asset discovery: nmap/Scapy scans via the helper, asset + port inventory. |
-| [M4](Modules/M04-suricata-sensor_1.md) | Suricata sensor: rule staging, start/stop/status control through the helper, EVE log output. |
-| [M5](Modules/M05-event-pipeline_1.md) | Event pipeline: tails EVE JSON, normalizes and deduplicates into the partitioned `events` table. |
-| [M6](Modules/M06-search_1.md) | Search: faceted event search with cached facet counts and bounded time windows. |
-| [M7](Modules/M07-correlation_1.md) | Correlation: rule-based grouping of related events into incident candidates. |
-| [M8](Modules/M08-incidents_1.md) | Incidents: promotion, triage workflow, history, evidence linking. |
-| [M9](Modules/M09-reporting_1.md) | Reporting: four report types, async PDF/CSV/JSON generation, admin-managed schedules. |
-| [M10](Modules/M10-firewall_1.md) | Firewall containment: TTL-bounded `iptables` blocks via the helper, protected-IP guard, reconciliation. |
-| [M11](Modules/M11-pcap_1.md) | PCAP analysis: upload, tshark-based flow/artifact extraction, stream follow, packet listing. |
-| [M12](Modules/M12-threat-intel_1.md) | Threat intel: IOC management, feed ingestion, live traffic matching, retro-hunts. |
+| [M3](reports/modules/M03-asset-discovery_1.md) | Asset discovery: nmap/Scapy scans via the helper, asset + port inventory. |
+| [M4](reports/modules/M04-suricata-sensor_1.md) | Suricata sensor: rule staging, start/stop/status control through the helper, EVE log output. |
+| [M5](reports/modules/M05-event-pipeline_1.md) | Event pipeline: tails EVE JSON, normalizes and deduplicates into the partitioned `events` table. |
+| [M6](reports/modules/M06-search_1.md) | Search: faceted event search with cached facet counts and bounded time windows. |
+| [M7](reports/modules/M07-correlation_1.md) | Correlation: rule-based grouping of related events into incident candidates. |
+| [M8](reports/modules/M08-incidents_1.md) | Incidents: promotion, triage workflow, history, evidence linking. |
+| [M9](reports/modules/M09-reporting_1.md) | Reporting: four report types, async PDF/CSV/JSON generation, admin-managed schedules. |
+| [M10](reports/modules/M10-firewall_1.md) | Firewall containment: TTL-bounded `iptables` blocks via the helper, protected-IP guard, reconciliation. |
+| [M11](reports/modules/M11-pcap_1.md) | PCAP analysis: upload, tshark-based flow/artifact extraction, stream follow, packet listing. |
+| [M12](reports/modules/M12-threat-intel_1.md) | Threat intel: IOC management, feed ingestion, live traffic matching, retro-hunts. |
 
 Follow-up upgrade work (audit-log immutability, PCAP isolation decision,
 this README/CI, dashboard top-talkers, threat model, validation, and
-performance measurement) is tracked in `updates/U00-INDEX.md` through
+performance measurement) is tracked in `reports/updates/U00-INDEX.md` through
 `U09-performance-footprint.md`.
 
 ---
@@ -184,11 +184,11 @@ performance measurement) is tracked in `updates/U00-INDEX.md` through
   reconciliation loop keeps the kernel's rule set in sync with the database.
 - **Protected IPs**: the configured gateway, DNS server(s), and the
   platform's own host address can never be blocked, no matter who asks or
-  how — enforced in `helper/helper/guards.py`, independent of the API layer.
+  how — enforced in `backend/helper/helper/guards.py`, independent of the API layer.
 - **Append-only audit trail**: every write action is logged to `audit_log`,
   which the database itself refuses to `UPDATE`/`DELETE`/`TRUNCATE` (even
   for the table owner), plus a SHA-256 hash chain for tamper evidence — see
-  `docs/threat-model.md`.
+  `reports/docs/threat-model.md`.
 
 ---
 

@@ -1,16 +1,21 @@
 import {
   Activity,
+  ArrowLeft,
   ArrowRight,
   Check,
   ChevronDown,
   ChevronRight,
+  Database,
   FileSearch,
   Fingerprint,
+  GitBranch,
+  Lock,
   Menu,
   Network,
   Pause,
   Play,
   Radar,
+  ScanSearch,
   Shield,
   ShieldCheck,
   Sparkles,
@@ -47,6 +52,109 @@ const steps = [
   ["Observe", "The sensor inspects mirrored traffic and produces explainable detections."],
   ["Connect", "Related events are grouped so analysts see one incident, not a wall of alerts."],
   ["Respond", "Teams investigate the evidence, contain the source, and record the outcome."],
+];
+
+const operationSlides = [
+  {
+    icon: Radar,
+    number: "01",
+    label: "Inventory",
+    title: "Discover what belongs",
+    text: "Scan an authorized network, identify hosts and services, and keep a living asset record instead of a forgotten spreadsheet.",
+    detail: "Assets · Ports · Scan history",
+  },
+  {
+    icon: ScanSearch,
+    number: "02",
+    label: "Detection",
+    title: "Turn packets into signal",
+    text: "Suricata rules inspect traffic while sensor health, throughput, and rule sources stay visible from one workspace.",
+    detail: "Sensor · Rules · EVE events",
+  },
+  {
+    icon: Database,
+    number: "03",
+    label: "Evidence",
+    title: "Search without losing context",
+    text: "Filter events by time, severity, protocol, signature, or address and return to useful investigations with saved searches.",
+    detail: "Facets · Keyset search · Saved views",
+  },
+  {
+    icon: GitBranch,
+    number: "04",
+    label: "Correlation",
+    title: "Connect the quiet clues",
+    text: "Rules group threshold, sequence, rare, and beacon-like behavior into candidates that explain why they were created.",
+    detail: "Rules · Candidates · Run history",
+  },
+  {
+    icon: FileSearch,
+    number: "05",
+    label: "Investigation",
+    title: "Work the incident, not the noise",
+    text: "Promote candidates, attach evidence, assign ownership, record decisions, and keep every state change in the timeline.",
+    detail: "Triage · Evidence · History",
+  },
+  {
+    icon: ShieldCheck,
+    number: "06",
+    label: "Response",
+    title: "Contain with a way back",
+    text: "Apply time-limited blocks with protected-address checks, then export the evidence as a report for review.",
+    detail: "TTL blocks · Audit · Reports",
+  },
+];
+
+const signalItems = [
+  ["DISCOVERY", "Hosts and exposed services"],
+  ["SENSOR", "Suricata rules and health"],
+  ["PIPELINE", "Normalized searchable events"],
+  ["CORRELATION", "Related behavior connected"],
+  ["INCIDENTS", "Evidence-led investigation"],
+  ["RESPONSE", "Guarded, reversible action"],
+];
+
+const workbenchViews = [
+  {
+    id: "observe",
+    icon: Activity,
+    label: "Observe",
+    eyebrow: "Live signal",
+    title: "A new service appears",
+    text: "The event keeps the host, port, protocol, sensor signature, and original timestamp together.",
+    badge: "Review",
+    accent: "amber",
+    rows: [["Asset", "media-hub.local"], ["Service", "TCP / 8080"], ["First seen", "just now"]],
+  },
+  {
+    id: "investigate",
+    icon: ScanSearch,
+    label: "Investigate",
+    eyebrow: "Connected evidence",
+    title: "Related behavior is grouped",
+    text: "Correlation explains which rule matched and places the relevant events beside one another for review.",
+    badge: "Candidate",
+    accent: "violet",
+    rows: [["Rule", "Rare outbound service"], ["Evidence", "4 related events"], ["Window", "15 minutes"]],
+  },
+  {
+    id: "respond",
+    icon: ShieldCheck,
+    label: "Respond",
+    eyebrow: "Guarded action",
+    title: "Containment stays reversible",
+    text: "Protected addresses are checked first, expiry is mandatory, and the action is written to the audit history.",
+    badge: "Ready",
+    accent: "emerald",
+    rows: [["Action", "Block source IP"], ["Duration", "30 minutes"], ["Rollback", "Automatic"]],
+  },
+];
+
+const questions = [
+  ["Does SentinelCore make blocking decisions automatically?", "No. Detections and candidates preserve their evidence, while containment remains an explicit, guarded action with protected-address checks and an expiry."],
+  ["Can a first-time user understand what to do next?", "The experience is organized around plain-language priorities: what changed, why it matters, what evidence supports it, and which safe action is available."],
+  ["Where does the security data go?", "The supplied deployment is self-hosted. Events, incidents, reports, and audit history stay inside the SentinelCore stack you operate."],
+  ["Can teams separate access by responsibility?", "Yes. Viewer, analyst, and administrator roles keep observation, investigation, and system-changing controls distinct."],
 ];
 
 const WORDMARK_LETTERS = ["S", "e", "c", "u", "r", "e", "H"];
@@ -246,6 +354,221 @@ function ConsolePreview() {
   );
 }
 
+function SignalMarquee() {
+  const content = [...signalItems, ...signalItems];
+  return (
+    <div className="signal-marquee border-b border-white/10" aria-label="SentinelCore platform capabilities">
+      <div className="signal-marquee-track">
+        {content.map(([label, text], index) => (
+          <div key={`${label}-${index}`} className="signal-marquee-item" aria-hidden={index >= signalItems.length}>
+            <span>{label}</span>
+            <i />
+            <strong>{text}</strong>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SpotlightCapability({ icon: Icon, index, title, text }) {
+  const moveSpotlight = (event) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    event.currentTarget.style.setProperty("--spot-x", `${event.clientX - bounds.left}px`);
+    event.currentTarget.style.setProperty("--spot-y", `${event.clientY - bounds.top}px`);
+  };
+
+  return (
+    <article className="capability-card group" onPointerMove={moveSpotlight}>
+      <span className="capability-card-glow" aria-hidden="true" />
+      <div className="relative z-10 flex items-center justify-between">
+        <span className="font-mono text-[10px] tracking-[0.18em] text-white/30 group-hover:text-violet-200">// {index}</span>
+        <span className="capability-icon"><Icon size={24} strokeWidth={1.5} /></span>
+      </div>
+      <div className="relative z-10 mt-auto pt-24">
+        <h3 className="text-2xl font-semibold tracking-[-0.03em]">{title}</h3>
+        <p className="mt-3 text-sm leading-6 text-white/45 transition-colors group-hover:text-white/68">{text}</p>
+        <span className="mt-6 inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.16em] text-violet-300 opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100">
+          Explore the layer <ArrowRight size={12} />
+        </span>
+      </div>
+      <span className="capability-pixels" aria-hidden="true">
+        {Array.from({ length: 12 }, (_, pixel) => <i key={pixel} style={{ "--pixel-delay": `${pixel * 22}ms` }} />)}
+      </span>
+    </article>
+  );
+}
+
+function OperationsCarousel() {
+  const viewportRef = useRef(null);
+  const dragRef = useRef({ active: false, startX: 0, scrollLeft: 0, moved: false });
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  const goTo = (index) => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const normalized = (index + operationSlides.length) % operationSlides.length;
+    const card = viewport.children[normalized];
+    viewport.scrollTo({ left: card.offsetLeft - viewport.offsetLeft, behavior: "smooth" });
+    setActive(normalized);
+  };
+
+  useEffect(() => {
+    if (paused) return undefined;
+    const timer = window.setInterval(() => goTo(active + 1), 5200);
+    return () => window.clearInterval(timer);
+  }, [active, paused]);
+
+  const updateActive = () => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const center = viewport.scrollLeft + viewport.clientWidth / 2;
+    let nearest = 0;
+    let distance = Number.POSITIVE_INFINITY;
+    Array.from(viewport.children).forEach((child, index) => {
+      const childCenter = child.offsetLeft + child.clientWidth / 2;
+      const nextDistance = Math.abs(center - childCenter);
+      if (nextDistance < distance) {
+        distance = nextDistance;
+        nearest = index;
+      }
+    });
+    setActive(nearest);
+  };
+
+  const startDrag = (event) => {
+    if (event.pointerType !== "mouse") return;
+    const viewport = viewportRef.current;
+    dragRef.current = { active: true, startX: event.clientX, scrollLeft: viewport.scrollLeft, moved: false };
+    viewport.setPointerCapture(event.pointerId);
+    viewport.classList.add("is-dragging");
+  };
+
+  const drag = (event) => {
+    if (!dragRef.current.active) return;
+    const distance = event.clientX - dragRef.current.startX;
+    if (Math.abs(distance) > 4) dragRef.current.moved = true;
+    viewportRef.current.scrollLeft = dragRef.current.scrollLeft - distance;
+  };
+
+  const endDrag = (event) => {
+    if (!dragRef.current.active) return;
+    dragRef.current.active = false;
+    viewportRef.current.classList.remove("is-dragging");
+    if (viewportRef.current.hasPointerCapture(event.pointerId)) viewportRef.current.releasePointerCapture(event.pointerId);
+    updateActive();
+  };
+
+  return (
+    <div className="operations-carousel" onPointerEnter={() => setPaused(true)} onPointerLeave={() => setPaused(false)}>
+      <div
+        ref={viewportRef}
+        className="operations-viewport"
+        onScroll={() => window.requestAnimationFrame(updateActive)}
+        onPointerDown={startDrag}
+        onPointerMove={drag}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+      >
+        {operationSlides.map(({ icon: Icon, number, label, title, text, detail }, index) => (
+          <article key={title} className={`operation-slide ${active === index ? "is-active" : ""}`}>
+            <div className="operation-slide-top">
+              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/35">// {number} · {label}</span>
+              <span className="operation-slide-icon"><Icon size={26} strokeWidth={1.4} /></span>
+            </div>
+            <div className="operation-orbit" aria-hidden="true"><i /><i /><i /></div>
+            <div className="relative z-10 mt-auto">
+              <h3>{title}</h3>
+              <p>{text}</p>
+              <span className="operation-detail">{detail}</span>
+            </div>
+          </article>
+        ))}
+      </div>
+      <div className="operations-controls">
+        <span className="operations-count">{String(active + 1).padStart(2, "0")} / {String(operationSlides.length).padStart(2, "0")}</span>
+        <div className="operations-progress" aria-hidden="true"><span style={{ width: `${((active + 1) / operationSlides.length) * 100}%` }} /></div>
+        <div className="flex gap-2">
+          <button type="button" onClick={() => goTo(active - 1)} aria-label="Previous platform capability"><ArrowLeft size={17} /></button>
+          <button type="button" onClick={() => goTo(active + 1)} aria-label="Next platform capability"><ArrowRight size={17} /></button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EvidenceWorkbench() {
+  const [active, setActive] = useState(0);
+  const view = workbenchViews[active];
+  const ActiveIcon = view.icon;
+
+  return (
+    <div className="workbench-grid">
+      <div className="workbench-tabs" role="tablist" aria-label="Incident workflow stages">
+        {workbenchViews.map(({ icon: Icon, label }, index) => (
+          <button
+            key={label}
+            type="button"
+            role="tab"
+            aria-selected={active === index}
+            onClick={() => setActive(index)}
+          >
+            <span>0{index + 1}</span>
+            <Icon size={17} />
+            <strong>{label}</strong>
+            <ArrowRight size={15} className="ml-auto" />
+          </button>
+        ))}
+      </div>
+
+      <div className={`workbench-panel workbench-${view.accent}`} role="tabpanel" key={view.id}>
+        <div className="workbench-scan" aria-hidden="true" />
+        <div className="relative z-10 flex items-start justify-between gap-6">
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/35">{view.eyebrow}</p>
+            <h3>{view.title}</h3>
+          </div>
+          <span className="workbench-status"><i /> {view.badge}</span>
+        </div>
+        <p className="relative z-10 mt-4 max-w-xl text-sm leading-6 text-white/50">{view.text}</p>
+        <div className="workbench-data relative z-10">
+          <div className="workbench-glyph"><ActiveIcon size={38} strokeWidth={1.2} /></div>
+          <div className="grid flex-1 gap-px bg-white/10 sm:grid-cols-3">
+            {view.rows.map(([label, value]) => (
+              <div key={label} className="bg-[#111118] p-4">
+                <p className="font-mono text-[8px] uppercase tracking-[0.15em] text-white/30">{label}</p>
+                <p className="mt-2 text-xs font-medium text-white/75">{value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function QuestionList() {
+  const [open, setOpen] = useState(0);
+  return (
+    <div className="question-list">
+      {questions.map(([question, answer], index) => {
+        const expanded = open === index;
+        return (
+          <div key={question} className={`question-item ${expanded ? "is-open" : ""}`}>
+            <button type="button" onClick={() => setOpen(expanded ? -1 : index)} aria-expanded={expanded}>
+              <span className="font-mono text-[10px] text-violet-300">0{index + 1}</span>
+              <strong>{question}</strong>
+              <i aria-hidden="true" />
+            </button>
+            <div className="question-answer"><div><p>{answer}</p></div></div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function LandingPage() {
   const { isAuthenticated, isLoading } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -265,6 +588,7 @@ export default function LandingPage() {
           <Link to="/" aria-label="SentinelCore home"><Brand /></Link>
           <nav className="ml-12 hidden items-center gap-8 text-xs text-white/55 md:flex" aria-label="Main navigation">
             <a href="#platform" className="transition-colors hover:text-white">Platform</a>
+            <a href="#modules" className="transition-colors hover:text-white">Modules</a>
             <a href="#workflow" className="transition-colors hover:text-white">How it works</a>
             <a href="#trust" className="transition-colors hover:text-white">Security model</a>
           </nav>
@@ -285,6 +609,7 @@ export default function LandingPage() {
           <div className="border-t border-white/10 bg-[#111118] px-5 py-5 sm:hidden">
             <nav className="grid gap-4 text-sm text-white/70">
               <a href="#platform" onClick={() => setMobileOpen(false)}>Platform</a>
+              <a href="#modules" onClick={() => setMobileOpen(false)}>Modules</a>
               <a href="#workflow" onClick={() => setMobileOpen(false)}>How it works</a>
               <a href="#trust" onClick={() => setMobileOpen(false)}>Security model</a>
               <Link to="/login" className="mt-2 bg-violet-400 px-4 py-3 text-center font-semibold text-[#101016]">Sign in to console</Link>
@@ -324,6 +649,8 @@ export default function LandingPage() {
           </div>
         </section>
 
+        <SignalMarquee />
+
         <section id="platform" className="border-b border-white/10 bg-[#0f0f15] px-5 py-24 sm:px-8 lg:py-32">
           <div className="mx-auto max-w-[1240px]">
             <div className="grid gap-8 lg:grid-cols-[.8fr_1.2fr] lg:items-end">
@@ -338,29 +665,48 @@ export default function LandingPage() {
 
             <div className="mt-14 grid border-l border-t border-white/10 md:grid-cols-3">
               {capabilities.map(({ icon: Icon, index, title, text }) => (
-                <article key={title} className="group min-h-[310px] border-b border-r border-white/10 bg-white/[0.015] p-7 transition hover:bg-violet-400 hover:text-[#111118] sm:p-9">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-[10px] tracking-[0.18em] text-white/30 group-hover:text-black/45">// {index}</span>
-                    <Icon size={24} strokeWidth={1.5} className="text-violet-300 group-hover:text-[#111118]" />
-                  </div>
-                  <h3 className="mt-24 text-2xl font-semibold tracking-[-0.03em]">{title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-white/45 group-hover:text-black/65">{text}</p>
-                </article>
+                <SpotlightCapability key={title} icon={Icon} index={index} title={title} text={text} />
               ))}
             </div>
+          </div>
+        </section>
+
+        <section id="modules" className="carousel-section border-b border-white/10 px-5 py-24 sm:px-8 lg:py-32">
+          <div className="mx-auto max-w-[1240px]">
+            <div className="grid gap-8 lg:grid-cols-[1fr_.72fr] lg:items-end">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-violet-300">[ 02 / Modules ]</p>
+                <h2 className="mt-5 max-w-3xl text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl">One connected system. Six clear moves.</h2>
+              </div>
+              <p className="max-w-xl text-sm leading-6 text-white/45 lg:ml-auto">Drag, swipe, or use the controls to explore the operational path. Every module passes context forward instead of starting the investigation over.</p>
+            </div>
+            <OperationsCarousel />
+          </div>
+        </section>
+
+        <section id="workbench" className="border-b border-white/10 bg-[#0f0f15] px-5 py-24 sm:px-8 lg:py-32">
+          <div className="mx-auto max-w-[1240px]">
+            <div className="grid gap-8 lg:grid-cols-[.72fr_1.28fr] lg:items-end">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-violet-300">[ 03 / Evidence workbench ]</p>
+                <h2 className="mt-5 text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl">Follow one signal all the way to action.</h2>
+              </div>
+              <p className="max-w-2xl text-base leading-7 text-white/50 lg:ml-auto">Explore the three views. SentinelCore keeps the reason, evidence, ownership, and response together so the next decision never depends on guesswork.</p>
+            </div>
+            <div className="mt-14"><EvidenceWorkbench /></div>
           </div>
         </section>
 
         <section id="workflow" className="landing-dots border-b border-white/10 px-5 py-24 sm:px-8 lg:py-32">
           <div className="mx-auto grid max-w-[1240px] gap-14 lg:grid-cols-[.72fr_1.28fr]">
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-violet-300">[ 02 / Workflow ]</p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-violet-300">[ 04 / Workflow ]</p>
               <h2 className="mt-5 text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl">A calm path through a live incident.</h2>
               <p className="mt-6 max-w-md text-sm leading-6 text-white/45">The interface keeps context attached to the work, so each handoff is clear and every response is accountable.</p>
             </div>
             <div className="border-t border-white/15">
               {steps.map(([title, text], index) => (
-                <div key={title} className="group grid gap-4 border-b border-white/15 py-8 sm:grid-cols-[4rem_9rem_1fr] sm:items-start">
+                <div key={title} className="workflow-row group grid gap-4 border-b border-white/15 py-8 sm:grid-cols-[4rem_9rem_1fr] sm:items-start">
                   <span className="font-mono text-xs text-violet-300">0{index + 1}</span>
                   <h3 className="text-xl font-medium tracking-[-0.02em]">{title}</h3>
                   <p className="max-w-xl text-sm leading-6 text-white/45 transition group-hover:text-white/65">{text}</p>
@@ -383,13 +729,27 @@ export default function LandingPage() {
                 [FileSearch, "Audit history", "Sensitive actions are recorded in a tamper-evident trail."],
                 [Fingerprint, "Role-aware access", "Viewer, analyst, and admin permissions stay distinct."],
               ].map(([Icon, title, text]) => (
-                <div key={title} className="bg-violet-400 p-6">
+                <div key={title} className="trust-card bg-violet-400 p-6">
                   <Icon size={20} />
                   <h3 className="mt-8 text-sm font-semibold">{title}</h3>
                   <p className="mt-2 text-xs leading-5 text-black/60">{text}</p>
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className="border-b border-white/10 bg-[#0f0f15] px-5 py-24 sm:px-8 lg:py-32">
+          <div className="mx-auto grid max-w-[1240px] gap-14 lg:grid-cols-[.75fr_1.25fr]">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-violet-300">[ 05 / Questions ]</p>
+              <h2 className="mt-5 text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl">The important details, without the fine-print fog.</h2>
+              <div className="mt-8 flex items-center gap-3 border border-white/10 bg-white/[0.025] p-4 text-xs text-white/45">
+                <Lock size={17} className="text-violet-300" />
+                <span>Designed for authorized environments and accountable actions.</span>
+              </div>
+            </div>
+            <QuestionList />
           </div>
         </section>
 

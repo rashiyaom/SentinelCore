@@ -1,7 +1,7 @@
 """M10 firewall tests: TTL bounds at both layers, idempotent apply/revoke
 against the real privileged helper, the expiry worker, and reconciliation in
 both drift directions. The protection guard itself is unit-tested exhaustively
-in helper/tests/test_guards.py — these tests exercise the layer above it.
+in backend/helper/tests/test_guards.py — these tests exercise the layer above it.
 """
 
 from __future__ import annotations

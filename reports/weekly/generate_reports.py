@@ -8,9 +8,9 @@ from docx.oxml.ns import qn
 from docx.shared import Inches, Pt, RGBColor
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = ROOT.parent / "Project-I_Weekly_Plan_and_Evaluation_Framework - Student.docx"
-OUTPUT = ROOT / "weekly_reports"
+OUTPUT = ROOT / "reports" / "weekly"
 EVIDENCE = OUTPUT / "evidence"
 REPOSITORY_URL = "https://github.com/rashiyaom/SentinelCore"
 PROJECT_TITLE = "SentinelCore: A Network Detection and Incident Response Platform"
