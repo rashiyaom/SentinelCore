@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { execFileSync, spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync } from "node:fs";
+import { chmodSync, copyFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -77,6 +77,25 @@ function requireEnvironment() {
   }
 }
 
+function environmentValue(name) {
+  const environment = execFileSync("sh", ["-c", `sed -n 's/^${name}=//p' .env | head -n 1`], {
+    cwd: projectRoot,
+    encoding: "utf8",
+  }).trim();
+  return environment.replace(/^['"]|['"]$/g, "");
+}
+
+function writeLocalAccessReadme() {
+  const username = environmentValue("SEED_ADMIN_USERNAME") || "admin";
+  const password = environmentValue("SEED_ADMIN_PASSWORD");
+  if (!password) return;
+
+  const path = resolve(projectRoot, "README.local.md");
+  writeFileSync(path, `# SentinelCore local admin access\n\n- URL: http://localhost\n- Username: ${username}\n- Password: ${password}\n\nThis file is generated locally by \`npm run dev\` and is deliberately excluded from Git.\n`, { mode: 0o600 });
+  chmodSync(path, 0o600);
+  success("Saved local admin credentials in README.local.md");
+}
+
 function syncRuntime() {
   note(`Preparing Docker runtime in ${runtimeRoot}`);
   mkdirSync(runtimeRoot, { recursive: true });
@@ -140,6 +159,7 @@ function openWorkspace() {
 async function start() {
   requireEnvironment();
   await ensureDocker();
+  writeLocalAccessReadme();
   syncRuntime();
   note("Starting database, Redis, backend, worker, helper, frontend, and nginx…");
   compose("up", "-d", "--build", "--remove-orphans");

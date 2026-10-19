@@ -127,6 +127,10 @@ waits for the website to become ready, then opens both
 **http://localhost/** and the GitHub repository. Pressing `Ctrl+C` stops the
 log view but leaves the services running.
 
+For local development, `npm run dev` also writes the configured admin login
+to `README.local.md`. That file is intentionally excluded from Git so the
+password never reaches GitHub.
+
 Useful development commands:
 
 ```bash
