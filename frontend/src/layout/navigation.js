@@ -22,21 +22,21 @@ import {
 export const NAV_GROUPS = [
   {
     label: null,
-    items: [{ to: "/", label: "Overview", icon: LayoutDashboard, roles: null, end: true }],
+    items: [{ to: "/dashboard", label: "Overview", icon: LayoutDashboard, roles: null, end: true }],
   },
   {
-    label: "Detect",
+    label: "Monitor",
     items: [
       { to: "/events", label: "Events", icon: Activity, roles: null },
-      { to: "/correlation", label: "Correlation", icon: GitMerge, roles: null },
       { to: "/incidents", label: "Incidents", icon: ShieldAlert, roles: null },
-      { to: "/intel", label: "Threat Intel", icon: Target, roles: null },
     ],
   },
   {
-    label: "Inventory",
+    label: "Investigate",
     items: [
       { to: "/assets", label: "Assets", icon: Radar, roles: null },
+      { to: "/correlation", label: "Correlation", icon: GitMerge, roles: null },
+      { to: "/intel", label: "Threat Intel", icon: Target, roles: null },
       { to: "/pcap", label: "PCAP", icon: FileSearch, roles: null },
     ],
   },
@@ -61,7 +61,7 @@ export const NAV_GROUPS = [
 export const NAV_ITEMS = NAV_GROUPS.flatMap((g) => g.items);
 
 export function titleForPath(pathname) {
-  if (pathname === "/") return "Overview";
+  if (pathname === "/dashboard") return "Overview";
   const match = NAV_ITEMS.filter((i) => i.to !== "/")
     .sort((a, b) => b.to.length - a.to.length)
     .find((i) => pathname === i.to || pathname.startsWith(`${i.to}/`));

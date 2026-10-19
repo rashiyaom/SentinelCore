@@ -50,7 +50,7 @@ export default function UserMenu() {
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-slate-100"
+        className="flex items-center gap-2 rounded-sm border border-transparent px-2 py-1.5 text-sm text-slate-400 transition hover:border-white/10 hover:bg-white/[0.04] hover:text-white"
       >
         <UserRound size={16} aria-hidden="true" />
         <span className="hidden max-w-[10rem] truncate sm:inline">{user.username}</span>
@@ -60,9 +60,9 @@ export default function UserMenu() {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 z-50 mt-1 w-56 overflow-hidden rounded-md border border-slate-700 bg-slate-800 shadow-lg animate-fade-in"
+          className="absolute right-0 z-50 mt-2 w-60 overflow-hidden rounded-sm border border-white/10 bg-[#17171f] shadow-2xl shadow-black/40 animate-fade-in"
         >
-          <div className="border-b border-slate-700 px-3 py-2.5">
+          <div className="border-b border-white/10 px-4 py-3.5">
             <p className="truncate text-sm font-medium text-slate-100">
               {user.full_name || user.username}
             </p>
@@ -79,7 +79,7 @@ export default function UserMenu() {
             role="menuitem"
             onClick={handleSignOut}
             disabled={signingOut}
-            className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-slate-300 hover:bg-slate-700 hover:text-slate-100 disabled:opacity-50"
+            className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-slate-400 hover:bg-white/[0.05] hover:text-white disabled:opacity-50"
           >
             <LogOut size={15} aria-hidden="true" />
             {signingOut ? "Signing out…" : "Sign out"}

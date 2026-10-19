@@ -47,7 +47,7 @@ export default function PipelineIndicator() {
   if (!status.stalled) {
     return (
       <span
-        className="hidden items-center gap-1.5 text-xs text-slate-500 xl:flex"
+        className="hidden items-center gap-1.5 font-mono text-[9px] uppercase tracking-wider text-slate-600 xl:flex"
         title={`${status.events_per_second}/s · lag ${status.stream_length} · ${status.total_events} events`}
       >
         <Database size={13} aria-hidden="true" />

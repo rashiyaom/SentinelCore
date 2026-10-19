@@ -30,9 +30,9 @@ export default function Table({
   };
 
   return (
-    <div className={clsx("overflow-x-auto rounded-lg border border-slate-800", className)}>
+    <div className={clsx("overflow-x-auto rounded-sm border border-white/10", className)}>
       <table className="min-w-full border-collapse text-sm">
-        <thead className="sticky top-0 z-10 bg-slate-800/90 backdrop-blur">
+        <thead className="sticky top-0 z-10 bg-[#191920]/95 backdrop-blur">
           <tr>
             {columns.map((col) => (
               <th
@@ -40,7 +40,7 @@ export default function Table({
                 scope="col"
                 onClick={() => handleSort(col)}
                 className={clsx(
-                  "whitespace-nowrap px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-400",
+                  "whitespace-nowrap px-4 py-3 text-left font-mono text-[9px] font-medium uppercase tracking-[0.15em] text-slate-500",
                   col.sortable && onSortChange && "cursor-pointer select-none hover:text-slate-200",
                   col.headerClassName,
                 )}
@@ -56,13 +56,13 @@ export default function Table({
           </tr>
         </thead>
 
-        <tbody className="divide-y divide-slate-800">
+        <tbody className="divide-y divide-white/[0.07] bg-[#101016]">
           {loading &&
             Array.from({ length: skeletonRows }).map((_, r) => (
               <tr key={`skeleton-${r}`} className="animate-pulse">
                 {columns.map((col) => (
                   <td key={col.key} className="px-3 py-3">
-                    <div className="h-3 w-full max-w-[10rem] rounded bg-slate-700/60" />
+                    <div className="h-3 w-full max-w-[10rem] rounded-sm bg-white/[0.07]" />
                   </td>
                 ))}
               </tr>
@@ -74,14 +74,14 @@ export default function Table({
                 key={rowKey(row, i)}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
                 className={clsx(
-                  "even:bg-slate-800/20",
-                  onRowClick && "cursor-pointer hover:bg-slate-700/40",
+                  "even:bg-white/[0.015]",
+                  onRowClick && "cursor-pointer hover:bg-violet-400/[0.06]",
                 )}
               >
                 {columns.map((col) => (
                   <td
                     key={col.key}
-                    className={clsx("px-3 py-2.5 align-middle text-slate-300", col.className)}
+                    className={clsx("px-4 py-3 align-middle text-slate-300", col.className)}
                   >
                     {col.render ? col.render(row) : row[col.key]}
                   </td>

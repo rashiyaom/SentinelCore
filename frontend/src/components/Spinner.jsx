@@ -30,10 +30,10 @@ export default function Spinner({ size = 16, className }) {
 
 export function FullPageSpinner({ label = "Loading SentinelCore" }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-900 text-slate-400">
+    <div className="landing-grid flex min-h-screen items-center justify-center bg-[#0b0b10] text-slate-500">
       <div className="flex flex-col items-center gap-3">
-        <Spinner size={28} className="text-sky-500" />
-        <p className="text-sm">{label}</p>
+        <Spinner size={28} className="text-violet-400" />
+        <p className="font-mono text-[10px] uppercase tracking-[0.16em]">{label}</p>
       </div>
     </div>
   );

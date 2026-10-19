@@ -9,6 +9,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import IncidentDetail from "./pages/incidents/IncidentDetail";
 import IncidentsPage from "./pages/incidents/IncidentsPage";
 import LoginPage from "./pages/LoginPage";
+import LandingPage from "./pages/LandingPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import SensorPage from "./pages/sensor/SensorPage";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -31,13 +32,14 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 export default function App() {
   return (
     <Routes>
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
 
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>
-          <Route index element={<OverviewPage />} />
+          <Route path="dashboard" element={<OverviewPage />} />
 
           <Route path="profile/notifications" element={<NotificationsPage />} />
 

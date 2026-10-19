@@ -6,20 +6,20 @@ export default function Card({ title, description, actions, className, bodyClass
   return (
     <section
       className={clsx(
-        "rounded-lg border border-slate-800 bg-slate-800/40 shadow-sm",
+        "rounded-sm border border-white/10 bg-[#111118] shadow-[0_18px_50px_rgba(0,0,0,0.16)]",
         className,
       )}
     >
       {hasHeader && (
-        <header className="flex items-start justify-between gap-4 border-b border-slate-800 px-4 py-3">
+        <header className="flex items-start justify-between gap-4 border-b border-white/10 px-5 py-4">
           <div className="min-w-0">
-            {title && <h3 className="text-sm font-semibold text-slate-100">{title}</h3>}
-            {description && <p className="mt-0.5 text-xs text-slate-400">{description}</p>}
+            {title && <h3 className="text-sm font-semibold tracking-[-0.015em] text-slate-100">{title}</h3>}
+            {description && <p className="mt-1 text-xs leading-5 text-slate-500">{description}</p>}
           </div>
           {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
         </header>
       )}
-      <div className={clsx("p-4", bodyClassName)}>{children}</div>
+      <div className={clsx("p-5", bodyClassName)}>{children}</div>
     </section>
   );
 }

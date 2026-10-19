@@ -1,6 +1,6 @@
-import { Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Menu, PanelLeftClose, PanelLeftOpen, Search } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 
 import clsx from "clsx";
 
@@ -36,7 +36,7 @@ export default function Layout() {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100">
+    <div className="app-surface min-h-screen text-slate-100">
       <Sidebar
         collapsed={collapsed}
         mobileOpen={mobileOpen}
@@ -49,7 +49,7 @@ export default function Layout() {
           collapsed ? "md:pl-sidebar-collapsed" : "md:pl-sidebar",
         )}
       >
-        <header className="sticky top-0 z-30 flex h-topbar items-center gap-3 border-b border-slate-800 bg-slate-900/95 px-4 backdrop-blur">
+        <header className="sticky top-0 z-30 flex h-topbar items-center gap-3 border-b border-white/10 bg-[#0b0b10]/90 px-4 backdrop-blur-xl sm:px-6">
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
@@ -68,9 +68,15 @@ export default function Layout() {
             {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
           </button>
 
-          <h1 className="min-w-0 truncate text-sm font-semibold text-slate-200">{title}</h1>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-slate-200">{title}</p>
+            <p className="hidden font-mono text-[8px] uppercase tracking-[0.16em] text-slate-600 sm:block">Protected workspace</p>
+          </div>
 
-          <div className="ml-auto flex items-center gap-4">
+          <div className="ml-auto flex items-center gap-3 sm:gap-4">
+            <Link to="/events" className="hidden h-8 items-center gap-2 border border-white/10 bg-white/[0.025] px-3 text-xs text-slate-500 transition hover:border-white/20 hover:text-slate-300 lg:flex" aria-label="Search events">
+              <Search size={13} /> <span>Search</span><kbd className="ml-4 font-mono text-[9px] text-slate-600">/</kbd>
+            </Link>
             <PipelineIndicator />
             <HealthDot />
             <UserMenu />
@@ -78,7 +84,7 @@ export default function Layout() {
         </header>
 
         <main className="flex-1 overflow-x-hidden">
-          <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6">
+          <div className="mx-auto w-full max-w-[1440px] px-4 py-7 sm:px-6 lg:px-8 lg:py-9">
             <Outlet />
           </div>
         </main>

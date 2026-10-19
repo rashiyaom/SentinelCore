@@ -1,4 +1,4 @@
-import { ShieldCheck } from "lucide-react";
+import { KeyRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
@@ -48,14 +48,15 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-900 px-4">
-      <div className="w-full max-w-sm">
+    <div className="landing-grid flex min-h-screen items-center justify-center bg-[#0b0b10] px-5">
+      <div className="w-full max-w-md border border-white/10 bg-[#111118] p-7 shadow-2xl shadow-black/30 sm:p-9">
         <div className="mb-6 flex flex-col items-center gap-2 text-center">
-          <ShieldCheck size={32} className="text-sky-500" aria-hidden="true" />
-          <h1 className="text-xl font-semibold tracking-tight text-slate-100">SentinelCore</h1>
+          <span className="grid h-11 w-11 place-items-center border border-violet-400/30 bg-violet-400/10 text-violet-300"><KeyRound size={19} /></span>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white">Choose a new password</h1>
+          <p className="text-xs leading-5 text-slate-500">Use at least {MIN_PASSWORD_LENGTH} characters for a strong account password.</p>
         </div>
 
-        <div className="space-y-4 rounded-lg border border-slate-800 bg-slate-800/40 p-6">
+        <div className="space-y-5">
           {!token ? (
             <p className="text-sm text-rose-300">This link is missing its token. Request a new one.</p>
           ) : done ? (
@@ -74,7 +75,7 @@ export default function ResetPasswordPage() {
                   autoFocus
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  className="mt-2 h-12 w-full border border-white/15 bg-white/[0.035] px-4 text-sm text-white outline-none focus:border-violet-400 focus:ring-1 focus:ring-violet-400"
                 />
               </div>
               <div>
@@ -88,7 +89,7 @@ export default function ResetPasswordPage() {
                   required
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
-                  className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  className="mt-2 h-12 w-full border border-white/15 bg-white/[0.035] px-4 text-sm text-white outline-none focus:border-violet-400 focus:ring-1 focus:ring-violet-400"
                 />
               </div>
 
@@ -105,7 +106,7 @@ export default function ResetPasswordPage() {
           )}
 
           <p className="text-center text-xs text-slate-500">
-            <Link to="/login" className="text-sky-400 hover:text-sky-300">
+            <Link to="/login" className="text-violet-300 hover:text-violet-200">
               Back to sign in
             </Link>
           </p>

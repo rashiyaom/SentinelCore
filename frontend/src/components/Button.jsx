@@ -3,12 +3,12 @@ import clsx from "clsx";
 import Spinner from "./Spinner";
 
 const VARIANTS = {
-  primary: "bg-sky-600 text-white hover:bg-sky-500 focus-visible:outline-sky-400",
+  primary: "bg-violet-400 text-[#111118] hover:bg-violet-300 focus-visible:outline-violet-300",
   secondary:
-    "bg-slate-700 text-slate-100 hover:bg-slate-600 focus-visible:outline-slate-400",
+    "border border-white/15 bg-white/[0.04] text-slate-200 hover:border-white/25 hover:bg-white/[0.08] focus-visible:outline-slate-400",
   danger: "bg-rose-600 text-white hover:bg-rose-500 focus-visible:outline-rose-400",
   ghost:
-    "bg-transparent text-slate-300 hover:bg-slate-800 hover:text-slate-100 focus-visible:outline-slate-500",
+    "bg-transparent text-slate-400 hover:bg-white/[0.06] hover:text-white focus-visible:outline-slate-500",
 };
 
 const SIZES = {
@@ -32,7 +32,7 @@ export default function Button({
       type={type}
       disabled={disabled || loading}
       className={clsx(
-        "inline-flex items-center justify-center rounded-md font-medium transition-colors",
+        "inline-flex items-center justify-center rounded-sm font-medium transition-colors",
         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
         "disabled:cursor-not-allowed disabled:opacity-50",
         VARIANTS[variant] ?? VARIANTS.primary,

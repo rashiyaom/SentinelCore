@@ -46,9 +46,9 @@ export default function HealthDot() {
 
   return (
     <span className="flex items-center gap-2" title={meta.label}>
-      <span className={clsx("h-2 w-2 rounded-full", meta.dot)} aria-hidden="true" />
+      <span className={clsx("h-1.5 w-1.5", meta.dot)} aria-hidden="true" />
       <span className="sr-only">{meta.label}</span>
-      <span className="hidden text-xs text-slate-400 lg:inline">
+      <span className="hidden font-mono text-[9px] uppercase tracking-wider text-slate-500 lg:inline">
         {state === "ok" ? "Healthy" : meta.label}
       </span>
     </span>
