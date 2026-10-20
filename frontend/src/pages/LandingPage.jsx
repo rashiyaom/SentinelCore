@@ -11,7 +11,6 @@ import {
   GitBranch,
   Lock,
   Menu,
-  Network,
   Pause,
   Play,
   Radar,
@@ -297,84 +296,6 @@ function Brand() {
         Sentinel<span className="text-violet-400">Core</span>
       </span>
     </span>
-  );
-}
-
-function ConsolePreview() {
-  return (
-    <div className="console-preview relative mx-auto w-full max-w-[610px] lg:ml-auto">
-      <div className="console-halo absolute -inset-8 blur-3xl" aria-hidden="true" />
-      <div className="console-frame relative overflow-hidden border border-white/15 bg-[#111118] shadow-2xl shadow-black/50">
-        <div className="flex h-11 items-center gap-2 border-b border-white/10 px-4">
-          <span className="h-2 w-2 bg-rose-400" />
-          <span className="h-2 w-2 bg-amber-300" />
-          <span className="h-2 w-2 bg-emerald-400" />
-          <span className="ml-3 font-mono text-[10px] uppercase tracking-[0.18em] text-white/35">
-            Live security overview · illustrative
-          </span>
-          <span className="ml-auto flex items-center gap-1.5 font-mono text-[10px] text-emerald-300">
-            <span className="h-1.5 w-1.5 animate-pulse bg-emerald-400" /> Protected
-          </span>
-        </div>
-
-        <div className="grid gap-px bg-white/10 sm:grid-cols-[1.1fr_.9fr]">
-          <div className="bg-[#111118] p-5 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/35">Network map</p>
-                <p className="mt-1 text-sm font-medium text-white/85">Traffic under watch</p>
-              </div>
-              <Network size={18} className="text-violet-400" />
-            </div>
-            <div className="network-map mt-5 h-56 border border-white/10 bg-[#0b0b10]">
-              <span className="network-line network-line-a" />
-              <span className="network-line network-line-b" />
-              <span className="network-line network-line-c" />
-              <span className="network-node network-node-main"><Shield size={18} /></span>
-              <span className="network-node network-node-a"><span>GW</span></span>
-              <span className="network-node network-node-b"><span>CAM</span></span>
-              <span className="network-node network-node-c"><span>NAS</span></span>
-              <span className="network-node network-node-d"><span>DNS</span></span>
-            </div>
-          </div>
-
-          <div className="bg-[#15151d] p-5 sm:p-6">
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/35">Priority queue</p>
-            <div className="mt-4 space-y-3">
-              <div className="border-l-2 border-rose-400 bg-white/[0.04] p-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[9px] uppercase tracking-wider text-rose-300">Critical</span>
-                  <span className="font-mono text-[9px] text-white/25">Now</span>
-                </div>
-                <p className="mt-2 text-xs font-medium text-white/80">Outbound C2 pattern</p>
-                <p className="mt-1 font-mono text-[9px] text-white/35">Camera → unknown host</p>
-              </div>
-              <div className="border-l-2 border-amber-300 bg-white/[0.04] p-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[9px] uppercase tracking-wider text-amber-200">Review</span>
-                  <span className="font-mono text-[9px] text-white/25">4m</span>
-                </div>
-                <p className="mt-2 text-xs font-medium text-white/80">New service detected</p>
-                <p className="mt-1 font-mono text-[9px] text-white/35">Port 8080 · Media device</p>
-              </div>
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <div className="border border-white/10 p-3">
-                  <p className="font-mono text-[9px] text-white/35">SENSOR</p>
-                  <p className="mt-1 text-xs text-emerald-300">● Running</p>
-                </div>
-                <div className="border border-white/10 p-3">
-                  <p className="font-mono text-[9px] text-white/35">PIPELINE</p>
-                  <p className="mt-1 text-xs text-white/75">Live</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="absolute -bottom-3 -left-3 hidden border border-violet-300/40 bg-violet-400 px-3 py-2 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-[#111118] sm:block">
-        Explainable by design
-      </div>
-    </div>
   );
 }
 
@@ -669,12 +590,151 @@ function FooterTypewriter() {
   );
 }
 
+function PixelHeroCanvas() {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return undefined;
+    const context = canvas.getContext("2d");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let width = 0;
+    let height = 0;
+    let columns = 0;
+    let rows = 0;
+    let cell = 24;
+    let frame = 0;
+    let running = !reducedMotion;
+    let scrollProgress = 0;
+    const pointer = { x: -1000, y: -1000, active: false };
+
+    const noise = (x, y) => {
+      const value = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+      return value - Math.floor(value);
+    };
+
+    const draw = (time = 0) => {
+      context.clearRect(0, 0, width, height);
+      context.fillStyle = "#101116";
+      context.fillRect(0, 0, width, height);
+
+      context.strokeStyle = "rgba(255,255,255,.055)";
+      context.lineWidth = 1;
+      context.beginPath();
+      for (let x = 0; x <= columns; x += 1) {
+        context.moveTo(x * cell + 0.5, 0);
+        context.lineTo(x * cell + 0.5, height);
+      }
+      for (let y = 0; y <= rows; y += 1) {
+        context.moveTo(0, y * cell + 0.5);
+        context.lineTo(width, y * cell + 0.5);
+      }
+      context.stroke();
+
+      const phase = scrollProgress * 5.2;
+      for (let x = 0; x < columns; x += 1) {
+        const normalized = x / Math.max(columns - 1, 1);
+        const ridge =
+          rows * 0.17 +
+          Math.max(0, Math.sin(normalized * Math.PI * 3.2 - 1.1 + phase * 0.18)) * rows * 0.2 +
+          Math.max(0, Math.sin(normalized * Math.PI * 7.4 + 1.7 - phase * 0.12)) * rows * 0.105 +
+          Math.max(0, Math.sin(normalized * Math.PI * 13.5 - 2.6)) * rows * 0.045;
+
+        for (let y = 0; y < rows; y += 1) {
+          const distanceFromFloor = rows - y;
+          const scatter = noise(x, y);
+          const inTerrain = distanceFromFloor < ridge && scatter > 0.17 + (distanceFromFloor / Math.max(ridge, 1)) * 0.2;
+          const pulseBand = Math.abs(distanceFromFloor - ridge * 0.72) < 1 && scatter > 0.42;
+          const dx = x * cell + cell / 2 - pointer.x;
+          const dy = y * cell + cell / 2 - pointer.y;
+          const hoverDistance = Math.hypot(dx, dy);
+          const hover = pointer.active ? Math.max(0, 1 - hoverDistance / (cell * 4.5)) : 0;
+          if (!inTerrain && !pulseBand && hover < 0.08) continue;
+
+          const base = 0.42 + scatter * 0.48;
+          const pulse = reducedMotion ? 0 : (Math.sin(time * 0.0015 + x * 0.5 + y * 0.27) + 1) * 0.055;
+          const alpha = Math.min(1, base + hover * 0.7 + pulse);
+          const red = Math.round(39 + hover * 115);
+          const green = Math.round(82 + hover * 145);
+          const blue = Math.round(220 + hover * 35);
+          context.fillStyle = `rgba(${red},${green},${blue},${alpha})`;
+          context.fillRect(x * cell + 1.5, y * cell + 1.5, cell - 3, cell - 3);
+
+          if (hover > 0.72) {
+            context.strokeStyle = `rgba(255,255,255,${hover * 0.7})`;
+            context.strokeRect(x * cell + 3.5, y * cell + 3.5, cell - 7, cell - 7);
+          }
+        }
+      }
+      if (running) frame = window.requestAnimationFrame(draw);
+    };
+
+    const resize = () => {
+      const bounds = canvas.getBoundingClientRect();
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      cell = bounds.width < 640 ? 16 : bounds.width < 1024 ? 20 : 24;
+      width = bounds.width;
+      height = bounds.height;
+      columns = Math.ceil(width / cell);
+      rows = Math.ceil(height / cell);
+      canvas.width = Math.round(width * ratio);
+      canvas.height = Math.round(height * ratio);
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      if (reducedMotion) draw();
+    };
+    const updateScroll = () => {
+      const bounds = canvas.getBoundingClientRect();
+      scrollProgress = Math.min(1, Math.max(0, (window.innerHeight - bounds.top) / (window.innerHeight + bounds.height)));
+      if (reducedMotion) draw();
+    };
+    const updatePointer = (event) => {
+      const bounds = canvas.getBoundingClientRect();
+      pointer.x = event.clientX - bounds.left;
+      pointer.y = event.clientY - bounds.top;
+      pointer.active = true;
+      if (reducedMotion) draw();
+    };
+    const clearPointer = () => {
+      pointer.active = false;
+      if (reducedMotion) draw();
+    };
+
+    const observer = new ResizeObserver(resize);
+    observer.observe(canvas);
+    canvas.addEventListener("pointermove", updatePointer);
+    canvas.addEventListener("pointerleave", clearPointer);
+    window.addEventListener("scroll", updateScroll, { passive: true });
+    resize();
+    updateScroll();
+    draw();
+
+    return () => {
+      running = false;
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+      canvas.removeEventListener("pointermove", updatePointer);
+      canvas.removeEventListener("pointerleave", clearPointer);
+      window.removeEventListener("scroll", updateScroll);
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} className="pixel-hero-canvas" aria-label="Interactive pixel visualization of live network signals" />;
+}
+
 export default function LandingPage() {
   const { isAuthenticated, isLoading } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [navScrolled, setNavScrolled] = useState(false);
 
   useEffect(() => {
     document.title = "SentinelCore · Understand and protect your network";
+  }, []);
+
+  useEffect(() => {
+    const updateNavigation = () => setNavScrolled(window.scrollY > window.innerHeight + 12);
+    updateNavigation();
+    window.addEventListener("scroll", updateNavigation, { passive: true });
+    return () => window.removeEventListener("scroll", updateNavigation);
   }, []);
 
   if (!isLoading && isAuthenticated) return <Navigate to="/dashboard" replace />;
@@ -683,16 +743,16 @@ export default function LandingPage() {
     <div className="landing-shell min-h-screen overflow-x-clip bg-[#0b0b10] text-white">
       <VideoIntro />
 
-      <header id="home" className="sticky top-0 z-50 border-b border-white/10 bg-[#0b0b10]/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-[1240px] items-center px-5 sm:px-8">
+      <header id="home" className={`landing-nav sticky top-0 z-50 ${navScrolled ? "is-scrolled" : ""}`}>
+        <div className="landing-nav-shell">
           <Link to="/" aria-label="SentinelCore home"><Brand /></Link>
-          <nav className="ml-12 hidden items-center gap-8 text-xs text-white/55 md:flex" aria-label="Main navigation">
+          <nav className="landing-nav-links" aria-label="Main navigation">
             <a href="#platform" className="transition-colors hover:text-white">Platform</a>
             <a href="#modules" className="transition-colors hover:text-white">Modules</a>
             <a href="#workflow" className="transition-colors hover:text-white">How it works</a>
             <a href="#trust" className="transition-colors hover:text-white">Security model</a>
           </nav>
-          <div className="ml-auto hidden items-center gap-3 sm:flex">
+          <div className="landing-nav-actions">
             <span className="hidden font-mono text-[10px] uppercase tracking-[0.16em] text-emerald-300 lg:inline">● System ready</span>
             <Link to="/login" className="border border-white/15 px-4 py-2 text-xs font-medium text-white/80 transition hover:border-white/30 hover:bg-white/5 hover:text-white">
               Sign in
@@ -701,12 +761,12 @@ export default function LandingPage() {
               Open console <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>
-          <button className="ml-auto p-2 text-white/70 sm:hidden" onClick={() => setMobileOpen((v) => !v)} aria-label="Toggle navigation">
+          <button className="landing-nav-toggle" onClick={() => setMobileOpen((v) => !v)} aria-label="Toggle navigation">
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
         {mobileOpen && (
-          <div className="border-t border-white/10 bg-[#111118] px-5 py-5 sm:hidden">
+          <div className="landing-mobile-menu">
             <nav className="grid gap-4 text-sm text-white/70">
               <a href="#platform" onClick={() => setMobileOpen(false)}>Platform</a>
               <a href="#modules" onClick={() => setMobileOpen(false)}>Modules</a>
@@ -719,41 +779,28 @@ export default function LandingPage() {
       </header>
 
       <main>
-        <section className="landing-hero relative border-b border-white/10">
-          <div className="hero-aurora" aria-hidden="true"><i /><i /><i /></div>
-          <div className="mx-auto grid min-h-[780px] max-w-[1320px] items-center gap-16 px-5 py-20 sm:px-8 lg:grid-cols-[.9fr_1.1fr] lg:py-28">
-            <div className="hero-copy relative z-10">
-              <div className="hero-eyebrow">
-                <span className="hero-eyebrow-mark"><ShieldCheck size={13} /></span>
-                <span>Clarity for every signal</span>
-                <i />
-                <span className="text-emerald-200/80">System online</span>
-              </div>
-              <h1 className="hero-title">
-                See your network
-                <span>with quiet confidence.</span>
-              </h1>
-              <p className="hero-lede">
-                Discover every device, understand what changed, and move from evidence to a safe response—without fighting the interface.
-              </p>
-              <div className="hero-actions">
-                <Link to="/login" className="hero-primary group">
-                  Enter secure console <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-                </Link>
-                <a href="#platform" className="hero-secondary">
-                  Explore the platform <ChevronRight size={16} />
-                </a>
-              </div>
-              <div className="hero-proof">
-                <span><Check size={13} /> Self-hosted</span>
-                <span><Check size={13} /> Explainable</span>
-                <span><Check size={13} /> Reversible actions</span>
+        <section className="pixel-hero">
+          <div className="pixel-hero-inner">
+            <div className="pixel-hero-topline"><span>[ 01 / Interactive signal field ]</span><i /><span>Move · hover · scroll</span></div>
+            <div className="pixel-hero-heading">
+              <h1>Make the invisible<br /><span>impossible to miss.</span></h1>
+              <div>
+                <p>SentinelCore turns network activity into a legible field—so every device, alert, and safe response has a place you can understand.</p>
+                <div className="hero-actions">
+                  <Link to="/login" className="hero-primary group">Enter secure console <ArrowRight size={16} /></Link>
+                  <a href="#platform" className="hero-secondary">Explore the system <ChevronRight size={16} /></a>
+                </div>
               </div>
             </div>
-            <div className="hero-console-wrap">
-              <span className="hero-float hero-float-top"><i /> 24 devices known</span>
-              <ConsolePreview />
-              <span className="hero-float hero-float-bottom"><ShieldCheck size={14} /> Protected by design</span>
+            <div className="pixel-hero-frame">
+              <PixelHeroCanvas />
+              <div className="pixel-hero-frame-top"><span><i /> Live network terrain</span><b>Illustrative signal field</b></div>
+              <div className="pixel-hero-frame-bottom"><span>Pointer reveals local activity</span><span>Scroll reshapes the field ↘</span></div>
+            </div>
+            <div className="pixel-hero-proof">
+              <span><Check size={13} /> Self-hosted</span>
+              <span><Check size={13} /> Explainable detections</span>
+              <span><Check size={13} /> Reversible response</span>
             </div>
           </div>
         </section>
