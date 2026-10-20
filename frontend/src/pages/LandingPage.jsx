@@ -628,6 +628,47 @@ function QuestionList() {
   );
 }
 
+const footerTypePhrases = ["map your network", "explain alerts", "respond safely"];
+
+function FooterTypewriter() {
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [characters, setCharacters] = useState(footerTypePhrases[0].length);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion) {
+      setCharacters(footerTypePhrases[0].length);
+      return undefined;
+    }
+
+    const phrase = footerTypePhrases[phraseIndex];
+    const atEnd = characters === phrase.length;
+    const atStart = characters === 0;
+    const delay = atEnd && !deleting ? 1650 : atStart && deleting ? 320 : deleting ? 34 : 62;
+    const timer = window.setTimeout(() => {
+      if (atEnd && !deleting) {
+        setDeleting(true);
+      } else if (atStart && deleting) {
+        setDeleting(false);
+        setPhraseIndex((current) => (current + 1) % footerTypePhrases.length);
+      } else {
+        setCharacters((current) => current + (deleting ? -1 : 1));
+      }
+    }, delay);
+    return () => window.clearTimeout(timer);
+  }, [characters, deleting, phraseIndex]);
+
+  return (
+    <span className="footer-typewriter" aria-hidden="true">
+      <span>[</span>
+      <span className="footer-typewriter-copy">{footerTypePhrases[phraseIndex].slice(0, characters)}</span>
+      <i className="footer-typewriter-caret" />
+      <span>]</span>
+    </span>
+  );
+}
+
 export default function LandingPage() {
   const { isAuthenticated, isLoading } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -810,22 +851,43 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="px-5 py-24 text-center sm:px-8 lg:py-32">
-          <div className="mx-auto max-w-3xl">
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-violet-300">Ready when you are</p>
-            <h2 className="mt-5 text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-6xl">Your network has a story. See it clearly.</h2>
-            <p className="mx-auto mt-6 max-w-xl text-sm leading-6 text-white/45">Sign in to review your environment, prioritize active incidents, and take the next safe action.</p>
-            <Link to="/login" className="group mt-9 inline-flex items-center gap-3 bg-white px-7 py-3.5 text-sm font-semibold text-[#111118] transition hover:bg-violet-300">
-              Open SentinelCore <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-            </Link>
+        <section className="footer-statement">
+          <div className="footer-statement-inner">
+            <div className="footer-statement-topline">
+              <span>[ 06 / A clearer way forward ]</span>
+              <i />
+              <Link to="/login">Open console <ArrowRight size={15} /></Link>
+            </div>
+
+            <h2 className="footer-display">
+              <span>A smarter way to</span>
+              <FooterTypewriter />
+              <span>around the clock.</span>
+              <span className="sr-only">A smarter way to map your network, explain alerts, and respond safely around the clock.</span>
+            </h2>
+
+            <div className="footer-proof-row">
+              <span className="footer-proof-tiles" aria-hidden="true"><i>01</i><i>03</i><i>06</i></span>
+              <span>Six connected security modules</span>
+              <b><ShieldCheck size={14} /> Evidence-first</b>
+              <em>/ Self-hosted</em>
+            </div>
+
+            <div className="footer-closing-row">
+              <h3><span>/</span> Less noise.<br />More confidence. <span>/</span></h3>
+              <div>
+                <p>See what changed, understand why it matters, and take the next safe action without losing context.</p>
+                <Link to="/login" className="footer-cta">Enter SentinelCore <ArrowRight size={17} /></Link>
+              </div>
+            </div>
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-white/10 px-5 py-8 sm:px-8">
-        <div className="mx-auto flex max-w-[1240px] flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+      <footer className="site-footer">
+        <div>
           <Brand />
-          <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-white/30">Network detection &amp; incident response · Authorized environments only</p>
+          <p>Network detection &amp; incident response · Authorized environments only</p>
         </div>
       </footer>
     </div>
