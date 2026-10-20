@@ -137,39 +137,54 @@ const signalItems = [
   ["RESPONSE", "Guarded, reversible action"],
 ];
 
-const workbenchViews = [
+const advantages = [
   {
-    id: "observe",
-    icon: Activity,
-    label: "Observe",
-    eyebrow: "Live signal",
-    title: "A new service appears",
-    text: "The event keeps the host, port, protocol, sensor signature, and original timestamp together.",
-    badge: "Review",
-    accent: "amber",
-    rows: [["Asset", "media-hub.local"], ["Service", "TCP / 8080"], ["First seen", "just now"]],
+    icon: "camera",
+    number: "01",
+    label: "Visibility",
+    title: "See every device",
+    text: "A living map of hosts, services, and exposed ports across the network you protect.",
+    theme: "dark",
   },
   {
-    id: "investigate",
-    icon: ScanSearch,
-    label: "Investigate",
-    eyebrow: "Connected evidence",
-    title: "Related behavior is grouped",
-    text: "Correlation explains which rule matched and places the relevant events beside one another for review.",
-    badge: "Candidate",
-    accent: "violet",
-    rows: [["Rule", "Rare outbound service"], ["Evidence", "4 related events"], ["Window", "15 minutes"]],
+    icon: "eye",
+    number: "02",
+    label: "Evidence",
+    title: "Understand every alert",
+    text: "The reason, source, timestamp, and related evidence stay connected from signal to decision.",
+    theme: "light",
   },
   {
-    id: "respond",
-    icon: ShieldCheck,
-    label: "Respond",
-    eyebrow: "Guarded action",
-    title: "Containment stays reversible",
-    text: "Protected addresses are checked first, expiry is mandatory, and the action is written to the audit history.",
-    badge: "Ready",
-    accent: "emerald",
-    rows: [["Action", "Block source IP"], ["Duration", "30 minutes"], ["Rollback", "Automatic"]],
+    icon: "signal",
+    number: "03",
+    label: "Correlation",
+    title: "Cut through the noise",
+    text: "Related clues become one clear incident, so your team investigates context instead of alert volume.",
+    theme: "dark",
+  },
+  {
+    icon: "shield",
+    number: "04",
+    label: "Response",
+    title: "Act with guardrails",
+    text: "Time-limited containment and protected-address checks make every response safer and reversible.",
+    theme: "light",
+  },
+  {
+    icon: "lock",
+    number: "05",
+    label: "Privacy",
+    title: "Keep control of your data",
+    text: "Self-hosted deployment keeps sensitive network evidence inside the environment you operate.",
+    theme: "dark",
+  },
+  {
+    icon: "audit",
+    number: "06",
+    label: "Accountability",
+    title: "Trace every decision",
+    text: "Role-aware access and an immutable audit history make sensitive actions clear and accountable.",
+    theme: "light",
   },
 ];
 
@@ -482,53 +497,113 @@ function OperationsCarousel() {
   );
 }
 
-function EvidenceWorkbench() {
+function PixelAdvantageIcon({ type }) {
+  const paths = {
+    camera: <path fillRule="evenodd" d="M0 1H6V5H0ZM2 2H4V4H2ZM6 2H8V4H6Z" />,
+    eye: <path fillRule="evenodd" d="M2 0H6V1H7V2H8V3H7V4H6V5H2V4H1V3H0V2H1V1H2ZM3 2H5V4H3Z" />,
+    signal: <path d="M0 3H1V5H0ZM2 1H3V7H2ZM4 3H5V5H4ZM6 0H7V8H6Z" />,
+    shield: <path fillRule="evenodd" d="M0 0H7V4H6V6H5V7H4V8H3V7H2V6H1V4H0ZM3 2H4V5H3Z" />,
+    lock: <><path d="M2 0H5V1H2ZM5 1H6V3H5ZM1 1H2V3H1Z" /><path fillRule="evenodd" d="M0 3H7V8H0ZM3 5H4V7H3Z" /></>,
+    audit: <path fillRule="evenodd" d="M0 0H5V1H6V8H0ZM4 1H5V2H4ZM1 3H5V4H1ZM1 5H5V6H1Z" />,
+  };
+  return <svg className="coverflow-pixel-icon" viewBox={type === "camera" || type === "eye" ? "0 0 8 6" : "0 0 7 8"} aria-hidden="true">{paths[type]}</svg>;
+}
+
+function AdvantagesCoverflow() {
+  const sectionRef = useRef(null);
   const [active, setActive] = useState(0);
-  const view = workbenchViews[active];
-  const ActiveIcon = view.icon;
+
+  useEffect(() => {
+    let frame;
+    const updateActive = () => {
+      const section = sectionRef.current;
+      if (!section) return;
+      const scrollDistance = section.offsetHeight - window.innerHeight;
+      if (scrollDistance <= 0) return;
+      const passed = Math.min(Math.max(-section.getBoundingClientRect().top, 0), scrollDistance);
+      setActive(Math.min(advantages.length - 1, Math.round((passed / scrollDistance) * (advantages.length - 1))));
+    };
+    const onScroll = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(updateActive);
+    };
+    updateActive();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
+  const selectCard = (index) => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const scrollDistance = section.offsetHeight - window.innerHeight;
+    const target = window.scrollY + section.getBoundingClientRect().top + (scrollDistance * index) / (advantages.length - 1);
+    window.scrollTo({ top: target, behavior: "smooth" });
+  };
+
+  const positionClass = (distance) => {
+    if (distance <= -3) return "is-far-left";
+    if (distance === -2) return "is-left-two";
+    if (distance === -1) return "is-left-one";
+    if (distance === 0) return "is-active";
+    if (distance === 1) return "is-right-one";
+    if (distance === 2) return "is-right-two";
+    return "is-far-right";
+  };
 
   return (
-    <div className="workbench-grid">
-      <div className="workbench-tabs" role="tablist" aria-label="Incident workflow stages">
-        {workbenchViews.map(({ icon: Icon, label }, index) => (
-          <button
-            key={label}
-            type="button"
-            role="tab"
-            aria-selected={active === index}
-            onClick={() => setActive(index)}
-          >
-            <span>0{index + 1}</span>
-            <Icon size={17} />
-            <strong>{label}</strong>
-            <ArrowRight size={15} className="ml-auto" />
-          </button>
-        ))}
-      </div>
-
-      <div className={`workbench-panel workbench-${view.accent}`} role="tabpanel" key={view.id}>
-        <div className="workbench-scan" aria-hidden="true" />
-        <div className="relative z-10 flex items-start justify-between gap-6">
+    <section ref={sectionRef} id="advantages" className="advantages-scroll" style={{ "--advantage-count": advantages.length, height: `${advantages.length * 100}svh` }}>
+      <div className="advantages-sticky">
+        <div className="advantages-header">
           <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/35">{view.eyebrow}</p>
-            <h3>{view.title}</h3>
+            <p className="advantages-kicker">[ 03 / Advantages of our website ]</p>
+            <h2>Built to make security feel clear.</h2>
           </div>
-          <span className="workbench-status"><i /> {view.badge}</span>
+          <p>Scroll through six practical advantages. This section releases when you reach the final card.</p>
         </div>
-        <p className="relative z-10 mt-4 max-w-xl text-sm leading-6 text-white/50">{view.text}</p>
-        <div className="workbench-data relative z-10">
-          <div className="workbench-glyph"><ActiveIcon size={38} strokeWidth={1.2} /></div>
-          <div className="grid flex-1 gap-px bg-white/10 sm:grid-cols-3">
-            {view.rows.map(([label, value]) => (
-              <div key={label} className="bg-[#111118] p-4">
-                <p className="font-mono text-[8px] uppercase tracking-[0.15em] text-white/30">{label}</p>
-                <p className="mt-2 text-xs font-medium text-white/75">{value}</p>
-              </div>
-            ))}
+
+        <div className="coverflow-frame">
+          <div className="coverflow-stage" role="tablist" aria-label="SentinelCore advantages">
+          {advantages.map(({ icon, number, label, title, text, theme }, index) => {
+            const distance = index - active;
+            return (
+              <button
+                key={number}
+                type="button"
+                role="tab"
+                aria-selected={active === index}
+                className={`coverflow-card ${theme === "light" ? "coverflow-card--light" : "coverflow-card--dark"} ${positionClass(distance)}`}
+                onClick={() => selectCard(index)}
+              >
+                <span className="coverflow-card-top">// {number} · {label}</span>
+                <PixelAdvantageIcon type={icon} />
+                <span className="coverflow-card-copy">
+                  <strong>{title}</strong>
+                  <span className="coverflow-card-text">{text}</span>
+                </span>
+              </button>
+            );
+          })}
+          </div>
+        </div>
+
+        <div className="advantages-footer">
+          <div className="advantages-progress" aria-label={`Advantage ${active + 1} of ${advantages.length}`}>
+            <span>{advantages[active].number} / {String(advantages.length).padStart(2, "0")}</span>
+            <div>{advantages.map((item, index) => <i key={item.number} className={index <= active ? "is-active" : ""} />)}</div>
+          </div>
+          <p><span>Scroll</span> to move through the cards</p>
+          <div className="advantages-controls">
+            <button type="button" onClick={() => selectCard(Math.max(0, active - 1))} disabled={active === 0} aria-label="Previous advantage"><ArrowLeft size={17} /></button>
+            <button type="button" onClick={() => selectCard(Math.min(advantages.length - 1, active + 1))} disabled={active === advantages.length - 1} aria-label="Next advantage"><ArrowRight size={17} /></button>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -564,7 +639,7 @@ export default function LandingPage() {
   if (!isLoading && isAuthenticated) return <Navigate to="/dashboard" replace />;
 
   return (
-    <div className="landing-shell min-h-screen overflow-hidden bg-[#0b0b10] text-white">
+    <div className="landing-shell min-h-screen overflow-x-clip bg-[#0b0b10] text-white">
       <VideoIntro />
 
       <header id="home" className="sticky top-0 z-50 border-b border-white/10 bg-[#0b0b10]/90 backdrop-blur-xl">
@@ -677,18 +752,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="workbench" className="border-b border-white/10 bg-[#0f0f15] px-5 py-24 sm:px-8 lg:py-32">
-          <div className="mx-auto max-w-[1240px]">
-            <div className="grid gap-8 lg:grid-cols-[.72fr_1.28fr] lg:items-end">
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-violet-300">[ 03 / Evidence workbench ]</p>
-                <h2 className="mt-5 text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl">Follow one signal all the way to action.</h2>
-              </div>
-              <p className="max-w-2xl text-base leading-7 text-white/50 lg:ml-auto">Explore the three views. SentinelCore keeps the reason, evidence, ownership, and response together so the next decision never depends on guesswork.</p>
-            </div>
-            <div className="mt-14"><EvidenceWorkbench /></div>
-          </div>
-        </section>
+        <AdvantagesCoverflow />
 
         <section id="workflow" className="landing-dots border-b border-white/10 px-5 py-24 sm:px-8 lg:py-32">
           <div className="mx-auto grid max-w-[1240px] gap-14 lg:grid-cols-[.72fr_1.28fr]">
