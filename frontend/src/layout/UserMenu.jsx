@@ -1,9 +1,10 @@
-import { ChevronDown, LogOut, UserRound } from "lucide-react";
+import { ChevronDown, GraduationCap, LogOut, PlayCircle, UserRound } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../auth/AuthContext";
 import Badge from "../components/Badge";
+import { useDemo } from "../demo/DemoContext";
 
 const ROLE_TONE = {
   admin: "danger",
@@ -13,6 +14,7 @@ const ROLE_TONE = {
 
 export default function UserMenu() {
   const { user, logout } = useAuth();
+  const { openTour } = useDemo();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
@@ -72,6 +74,27 @@ export default function UserMenu() {
                 <span className="truncate text-xs text-slate-500">{user.email}</span>
               )}
             </div>
+          </div>
+
+          <div className="border-b border-white/10 py-1.5">
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => { setOpen(false); openTour(); }}
+              className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-slate-400 hover:bg-white/[0.05] hover:text-white"
+            >
+              <GraduationCap size={15} aria-hidden="true" />
+              Open project guide
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => { setOpen(false); navigate("/demo"); }}
+              className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-slate-400 hover:bg-white/[0.05] hover:text-white"
+            >
+              <PlayCircle size={15} aria-hidden="true" />
+              Run guided demo
+            </button>
           </div>
 
           <button

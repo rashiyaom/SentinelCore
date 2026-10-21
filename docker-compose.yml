@@ -115,6 +115,12 @@ services:
       - no-new-privileges:true
     expose:
       - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health', timeout=2)"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
     depends_on:
       db:
         condition: service_healthy
@@ -172,8 +178,15 @@ services:
       - /app/node_modules
     expose:
       - "5173"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:5173/"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - sentinelcore-network
 
@@ -182,9 +195,13 @@ services:
     volumes:
       - ./backend/deployment/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
-      - "80:80"
+      # This is a local development stack. Keep the Vite-backed site off the
+      # LAN and expose it only through this machine's localhost interface.
+      - "127.0.0.1:80:80"
     depends_on:
-      - backend
-      - frontend
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
     networks:
       - sentinelcore-network

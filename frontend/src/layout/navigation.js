@@ -5,6 +5,7 @@ import {
   GitMerge,
   LayoutDashboard,
   Radar,
+  PlayCircle,
   ServerCog,
   ShieldAlert,
   ShieldBan,
@@ -22,7 +23,10 @@ import {
 export const NAV_GROUPS = [
   {
     label: null,
-    items: [{ to: "/dashboard", label: "Overview", icon: LayoutDashboard, roles: null, end: true }],
+    items: [
+      { to: "/dashboard", label: "Overview", icon: LayoutDashboard, roles: null, end: true },
+      { to: "/demo", label: "Demo Lab", icon: PlayCircle, roles: null, end: true },
+    ],
   },
   {
     label: "Monitor",
