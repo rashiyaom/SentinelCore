@@ -121,11 +121,12 @@ Then start the complete local stack from the repository root:
 npm run dev
 ```
 
-This one command starts Docker Desktop when needed, launches PostgreSQL,
-Redis, the privileged helper, API, pipeline worker, frontend, and nginx,
-waits for the website to become ready, then opens both
-**http://localhost/** and the GitHub repository. Pressing `Ctrl+C` stops the
-log view but leaves the services running.
+This one command starts Docker Desktop when needed and launches PostgreSQL,
+Redis, the privileged helper, API, pipeline worker, frontend, and nginx. On
+later runs it reuses the existing containers without rebuilding images or
+reinstalling dependencies. It verifies both the website and API, opens
+**http://localhost/** and the GitHub repository, then returns control to your
+terminal; the services continue running in Docker.
 
 For local development, `npm run dev` also writes the configured admin login
 to `README.local.md`. That file is intentionally excluded from Git so the
@@ -136,6 +137,8 @@ Useful development commands:
 ```bash
 npm run dev:status  # show every service
 npm run dev:logs    # follow all service logs
+npm run dev:restart # restart services without rebuilding images
+npm run dev:rebuild # rebuild after changing dependencies or Dockerfiles
 npm run dev:stop    # stop the complete stack
 npm run build       # production frontend build
 ```

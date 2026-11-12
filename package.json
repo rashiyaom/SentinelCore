@@ -5,6 +5,8 @@
   "description": "SentinelCore local development launcher",
   "scripts": {
     "dev": "node backend/scripts/dev.mjs start",
+    "dev:restart": "node backend/scripts/dev.mjs restart",
+    "dev:rebuild": "node backend/scripts/dev.mjs rebuild",
     "dev:stop": "node backend/scripts/dev.mjs stop",
     "dev:status": "node backend/scripts/dev.mjs status",
     "dev:logs": "node backend/scripts/dev.mjs logs",

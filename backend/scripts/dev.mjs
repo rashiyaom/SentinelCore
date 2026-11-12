@@ -102,9 +102,18 @@ function syncRuntime() {
 
   for (const directory of ["backend", "frontend"]) {
     const destination = resolve(runtimeRoot, directory);
+    const destinationAlreadyExists = existsSync(destination);
     mkdirSync(destination, { recursive: true });
     command("rsync", [
-      "-a",
+      // Compare file contents and do not preserve source mtimes. Docker
+      // Desktop can round timestamps in /tmp; copying those timestamps on
+      // every launch made Uvicorn reload the entire API even when no source
+      // content changed. Preserve file permissions only while creating a new
+      // runtime (the backend entrypoint must stay executable); repeatedly
+      // applying metadata causes Docker Desktop file-watch events.
+      destinationAlreadyExists ? "-rl" : "-rlp",
+      "--checksum",
+      "--omit-dir-times",
       "--delete",
       "--exclude", "node_modules",
       "--exclude", "dist",
@@ -124,15 +133,40 @@ function compose(...args) {
   return command("docker", [...composeArgs, ...args]);
 }
 
+function runningServices() {
+  const result = command("docker", [...composeArgs, "ps", "--services", "--status", "running"], {
+    capture: true,
+    allowFailure: true,
+  });
+  return new Set((result.stdout ?? "").split("\n").map((service) => service.trim()).filter(Boolean));
+}
+
+function stackIsRunning() {
+  const running = runningServices();
+  return ["db", "redis", "helper", "backend", "worker", "frontend", "nginx"]
+    .every((service) => running.has(service));
+}
+
+function reloadProxy() {
+  // Nginx resolves Compose service names when its config loads. If Compose
+  // replaces an upstream container, reload so Nginx immediately picks up the
+  // new container IP instead of serving a stale 502.
+  compose("exec", "-T", "nginx", "nginx", "-s", "reload");
+}
+
+function httpStatus(url) {
+  const response = command(
+    "curl",
+    ["-sS", "-o", "/dev/null", "-w", "%{http_code}", url],
+    { capture: true, allowFailure: true },
+  );
+  return response.stdout?.trim();
+}
+
 async function waitForSite() {
-  note("Waiting for http://localhost…");
+  note("Waiting for the website and API…");
   for (let attempt = 0; attempt < 45; attempt += 1) {
-    const response = command(
-      "curl",
-      ["-fsS", "-o", "/dev/null", "-w", "%{http_code}", "http://localhost/"],
-      { capture: true, allowFailure: true },
-    );
-    if (response.stdout?.trim() === "200") {
+    if (httpStatus("http://localhost/") === "200" && httpStatus("http://localhost/api/health") === "200") {
       success("SentinelCore is ready at http://localhost");
       return;
     }
@@ -161,20 +195,57 @@ async function start() {
   await ensureDocker();
   writeLocalAccessReadme();
   syncRuntime();
-  note("Starting database, Redis, backend, worker, helper, frontend, and nginx…");
-  compose("up", "-d", "--build", "--remove-orphans");
+  if (stackIsRunning()) {
+    note("Reusing the existing Docker stack (no image rebuild)…");
+    // Fast, idempotent reconciliation: unchanged containers remain running;
+    // Compose only applies configuration differences. --no-build guarantees
+    // this path can never reinstall image dependencies.
+    compose("up", "-d", "--no-build", "--remove-orphans");
+    success("Existing Docker stack reused");
+  } else {
+    note("Starting missing services with existing images…");
+    // Compose builds only images that do not exist. Normal starts never force
+    // dependency installation or rebuild an image that is already available.
+    compose("up", "-d", "--remove-orphans");
+  }
+  reloadProxy();
   await waitForSite();
   openWorkspace();
 
   console.log(`\n${color.green}SentinelCore development stack is running.${color.reset}`);
   console.log(`${color.dim}Website: http://localhost`);
   console.log(`GitHub:  ${repositoryUrl()}`);
+  console.log(`Logs:    npm run dev:logs`);
   console.log(`Stop:    npm run dev:stop${color.reset}\n`);
 
-  if (process.env.SENTINELCORE_NO_FOLLOW !== "1") {
+  if (process.env.SENTINELCORE_FOLLOW === "1") {
     note("Following service logs — press Ctrl+C to leave the servers running");
     compose("logs", "-f", "--tail", "80");
   }
+}
+
+async function restart() {
+  requireEnvironment();
+  await ensureDocker();
+  writeLocalAccessReadme();
+  syncRuntime();
+  note("Restarting SentinelCore services without rebuilding images…");
+  compose("restart");
+  reloadProxy();
+  await waitForSite();
+  success("SentinelCore restarted at http://localhost");
+}
+
+async function rebuild() {
+  requireEnvironment();
+  await ensureDocker();
+  writeLocalAccessReadme();
+  syncRuntime();
+  note("Rebuilding images because dependency or Docker configuration changed…");
+  compose("up", "-d", "--build", "--remove-orphans");
+  reloadProxy();
+  await waitForSite();
+  success("SentinelCore rebuilt and ready at http://localhost");
 }
 
 async function stop() {
@@ -205,6 +276,8 @@ async function logs() {
 
 try {
   if (mode === "start") await start();
+  else if (mode === "restart") await restart();
+  else if (mode === "rebuild") await rebuild();
   else if (mode === "stop") await stop();
   else if (mode === "status") await status();
   else if (mode === "logs") await logs();
