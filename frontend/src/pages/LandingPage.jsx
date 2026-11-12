@@ -64,6 +64,7 @@ const operationSlides = [
     detail: "Assets · Ports · Scan history",
     metric: "24",
     metricLabel: "devices mapped",
+    image: "/media/modules/inventory.webp",
   },
   {
     icon: ScanSearch,
@@ -76,6 +77,7 @@ const operationSlides = [
     detail: "Sensor · Rules · EVE events",
     metric: "Live",
     metricLabel: "packet inspection",
+    image: "/media/modules/detection.webp",
   },
   {
     icon: Database,
@@ -88,6 +90,7 @@ const operationSlides = [
     detail: "Facets · Keyset search · Saved views",
     metric: "<80ms",
     metricLabel: "event lookup",
+    image: "/media/modules/evidence.webp",
   },
   {
     icon: GitBranch,
@@ -100,6 +103,7 @@ const operationSlides = [
     detail: "Rules · Candidates · Run history",
     metric: "4→1",
     metricLabel: "signals connected",
+    image: "/media/modules/correlation.webp",
   },
   {
     icon: FileSearch,
@@ -112,6 +116,7 @@ const operationSlides = [
     detail: "Triage · Evidence · History",
     metric: "01",
     metricLabel: "shared timeline",
+    image: "/media/modules/investigation.webp",
   },
   {
     icon: ShieldCheck,
@@ -124,6 +129,7 @@ const operationSlides = [
     detail: "TTL blocks · Audit · Reports",
     metric: "30m",
     metricLabel: "automatic rollback",
+    image: "/media/modules/response.webp",
   },
 ];
 
@@ -390,12 +396,9 @@ function OperationsCarousel() {
             </div>
           </div>
 
-          <div className="operation-visual" aria-hidden="true">
-            <div className="operation-radar">
-              <span className="operation-radar-sweep" />
-              <i /><i /><i /><i />
-              <div><SlideIcon size={25} strokeWidth={1.35} /></div>
-            </div>
+          <div className="operation-visual">
+            <img className="operation-photo" src={slide.image} alt="" />
+            <span className="operation-photo-shade" aria-hidden="true" />
             <div className="operation-metric">
               <strong>{slide.metric}</strong>
               <span>{slide.metricLabel}</span>
@@ -737,6 +740,83 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", updateNavigation);
   }, []);
 
+  useEffect(() => {
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const revealGroups = [
+      [".pixel-hero-topline, .pixel-hero-heading, .pixel-hero-frame, .pixel-hero-proof", 95],
+      ["#platform > div > div:first-child > *, #platform .capability-card", 90],
+      ["#modules .modules-heading > *, #modules .operations-rail button, #modules .operation-focus", 65],
+      ["#advantages .advantages-header > *, #advantages .advantages-footer > *", 95],
+      ["#workflow > div > *, #workflow .workflow-row", 90],
+      ["#trust > div > *, #trust .trust-card", 85],
+      ["#questions > div > *, #questions .question-answer", 80],
+      [".footer-statement-topline, .footer-display, .footer-proof-row, .footer-closing-row > *", 105],
+    ];
+    const elements = [];
+    const cleanupTimers = [];
+    const finishReveal = (element) => {
+      element.classList.remove("scroll-reveal", "is-visible");
+      element.style.removeProperty("--reveal-delay");
+    };
+
+    revealGroups.forEach(([selector, stagger]) => {
+      document.querySelectorAll(selector).forEach((element, index) => {
+        if (elements.includes(element)) return;
+        element.classList.add("scroll-reveal");
+        element.style.setProperty("--reveal-delay", `${Math.min(index * stagger, 420)}ms`);
+        elements.push(element);
+      });
+    });
+
+    document.documentElement.classList.add("reveal-ready");
+    if (reducedMotion || !("IntersectionObserver" in window)) {
+      elements.forEach(finishReveal);
+      return () => document.documentElement.classList.remove("reveal-ready");
+    }
+
+    const pending = new Set(elements);
+    let scrollFrame = 0;
+    let observer;
+    const reveal = (element) => {
+      if (!pending.delete(element)) return;
+      element.classList.add("is-visible");
+      observer?.unobserve(element);
+      const delay = Number.parseInt(element.style.getPropertyValue("--reveal-delay"), 10) || 0;
+      cleanupTimers.push(window.setTimeout(() => finishReveal(element), 1050 + delay));
+    };
+    const revealInView = () => {
+      scrollFrame = 0;
+      pending.forEach((element) => {
+        const bounds = element.getBoundingClientRect();
+        if (bounds.top <= window.innerHeight * 0.93 && bounds.bottom >= 0) reveal(element);
+      });
+    };
+    const scheduleRevealCheck = () => {
+      if (!scrollFrame) scrollFrame = window.requestAnimationFrame(revealInView);
+    };
+
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        reveal(entry.target);
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -7% 0px" });
+
+    elements.forEach((element) => observer.observe(element));
+    window.addEventListener("scroll", scheduleRevealCheck, { passive: true });
+    window.addEventListener("resize", scheduleRevealCheck);
+    scheduleRevealCheck();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", scheduleRevealCheck);
+      window.removeEventListener("resize", scheduleRevealCheck);
+      window.cancelAnimationFrame(scrollFrame);
+      cleanupTimers.forEach((timer) => window.clearTimeout(timer));
+      elements.forEach(finishReveal);
+      document.documentElement.classList.remove("reveal-ready");
+    };
+  }, []);
+
   if (!isLoading && isAuthenticated) return <Navigate to="/dashboard" replace />;
 
   return (
@@ -827,14 +907,14 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="modules" className="carousel-section border-b border-white/10 px-5 py-24 sm:px-8 lg:py-32">
+        <section id="modules" className="carousel-section px-5 py-24 sm:px-8 lg:py-32">
           <div className="mx-auto max-w-[1240px]">
-            <div className="grid gap-8 lg:grid-cols-[1fr_.72fr] lg:items-end">
+            <div className="modules-heading grid gap-8 lg:grid-cols-[1fr_.72fr] lg:items-end">
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-violet-300">[ 02 / Modules ]</p>
+                <p className="modules-kicker font-mono text-[10px] uppercase tracking-[0.2em]">02 · A simpler security flow</p>
                 <h2 className="mt-5 max-w-3xl text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl">One connected system. Six clear moves.</h2>
               </div>
-              <p className="max-w-xl text-sm leading-6 text-white/45 lg:ml-auto">Choose a module to explore the operational path. Nothing moves without you; every stage passes its context forward instead of restarting the investigation.</p>
+              <p className="modules-intro max-w-xl text-sm leading-6 lg:ml-auto">Choose a step to see how your home stays protected. Every stage carries the right context forward, so nothing feels fragmented or difficult to follow.</p>
             </div>
             <OperationsCarousel />
           </div>
@@ -884,7 +964,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="border-b border-white/10 bg-[#0f0f15] px-5 py-24 sm:px-8 lg:py-32">
+        <section id="questions" className="border-b border-white/10 bg-[#0f0f15] px-5 py-24 sm:px-8 lg:py-32">
           <div className="mx-auto grid max-w-[1240px] gap-14 lg:grid-cols-[.75fr_1.25fr]">
             <div>
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-violet-300">[ 05 / Questions ]</p>

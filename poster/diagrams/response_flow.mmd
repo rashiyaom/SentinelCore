@@ -1,0 +1,22 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Arial','fontSize':'18px','primaryColor':'#eaf4fb','primaryTextColor':'#102a43','primaryBorderColor':'#3674a2','lineColor':'#617d91'},'flowchart':{'curve':'linear','nodeSpacing':22,'rankSpacing':25,'padding':12}}}%%
+flowchart LR
+  subgraph MON["01 · MONITOR"]
+    direction TB
+    A["Discover assets<br/>and monitor traffic"] --> B["Normalize EVE alerts<br/>and enrich context"]
+  end
+  subgraph INV["02 · INVESTIGATE"]
+    direction TB
+    C["Correlate events<br/>into a candidate"] --> D["Review evidence<br/>and promote incident"]
+  end
+  subgraph RES["03 · RESPOND"]
+    direction TB
+    E{"Containment<br/>needed?"} -->|"yes · admin"| F["Protected-IP check<br/>TTL block"]
+    E -->|"no"| G["Document · report<br/>resolve · audit"]
+    F --> G
+  end
+  B --> C
+  D --> E
+  classDef action fill:#163f5d,stroke:#163f5d,color:#fff,stroke-width:2px;
+  classDef guard fill:#fff2db,stroke:#d59227,color:#573c10,stroke-width:2px;
+  class C,D,G action;
+  class E,F guard;

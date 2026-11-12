@@ -1,0 +1,7 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Arial','fontSize':'23px','primaryColor':'#eaf4fb','primaryTextColor':'#102a43','primaryBorderColor':'#3674a2','lineColor':'#617d91'},'flowchart':{'curve':'linear','nodeSpacing':28,'rankSpacing':28,'padding':14}}}%%
+flowchart LR
+  A["Mirrored<br/>traffic"] --> B["Suricata<br/>signature sensor"] -->|"EVE JSON"| C["EVE<br/>tailer"] --> D["Redis<br/>stream"] --> E["Normalize<br/>deduplicate"] --> F[("PostgreSQL<br/>events")] --> G["Correlation<br/>4 rule types"] --> H["Candidates<br/>and incidents"]
+  classDef core fill:#163f5d,stroke:#163f5d,color:#fff,stroke-width:2px;
+  classDef sensor fill:#dcedf8,stroke:#2474a6,color:#102a43,stroke-width:2px;
+  class F,H core;
+  class B,C,D,E,G sensor;

@@ -1,0 +1,20 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Arial','fontSize':'18px','primaryColor':'#eaf4fb','primaryTextColor':'#102a43','primaryBorderColor':'#3674a2','lineColor':'#617d91'},'flowchart':{'curve':'linear','nodeSpacing':23,'rankSpacing':25,'padding':12}}}%%
+flowchart LR
+  subgraph START["01 · START"]
+    direction TB
+    A["Authenticated user<br/>viewer · analyst · admin"] --> B["First-login guidance<br/>six project cue cards"]
+  end
+  subgraph PRACTICE["02 · PRACTICE"]
+    direction TB
+    C["Demo Lab controls<br/>play · pause · reset"] --> D["Synthetic SSH case<br/>24 alerts → 1 candidate"]
+  end
+  subgraph REVIEW["03 · REVIEW"]
+    direction TB
+    E["Investigate → simulated block<br/>→ report → resolve"] --> F["Review evidence and lessons<br/>explore live modules"]
+  end
+  B --> C
+  D --> E
+  classDef demo fill:#163f5d,stroke:#163f5d,color:#fff,stroke-width:2px;
+  classDef safe fill:#e4f7f1,stroke:#13866e,color:#155746,stroke-width:2px;
+  class C,D,E demo;
+  class F safe;

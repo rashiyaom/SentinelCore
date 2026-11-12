@@ -1,0 +1,7 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Arial','fontSize':'23px','primaryColor':'#eaf4fb','primaryTextColor':'#102a43','primaryBorderColor':'#3674a2','lineColor':'#617d91'},'flowchart':{'curve':'linear','nodeSpacing':28,'rankSpacing':30,'padding':14}}}%%
+flowchart LR
+  U["Analyst browser<br/>React"] --> API["Nginx + FastAPI<br/>RBAC · audit · data"] -->|"Unix socket"| H["Privileged helper<br/>validated requests"] --> OPS["Nmap · sensor control<br/>TTL firewall"]
+  classDef core fill:#163f5d,stroke:#163f5d,color:#fff,stroke-width:2px;
+  classDef guard fill:#fff2db,stroke:#d59227,color:#573c10,stroke-width:2px;
+  class API core;
+  class H,OPS guard;

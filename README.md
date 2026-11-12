@@ -163,6 +163,20 @@ Docker network and not published to the host.
 | analyst | Everything a viewer can, plus triage/resolve incidents, run asset discovery scans, upload/analyze PCAPs, manage IOCs, generate reports. |
 | admin | Everything an analyst can, plus user management, sensor control (start/stop Suricata, rule overrides), firewall containment (block/unblock), threat-intel feed configuration. |
 
+### Guided onboarding and Demo Lab
+
+Every authenticated user receives a first-login cue-card tour explaining the
+asset → event → correlation → incident → response → report workflow. The tour
+is remembered per user in that browser and can be reopened at any time from
+the sidebar help card or account menu.
+
+The **Demo Lab** (`/demo`) is available to viewer, analyst, and admin roles. It
+replays a clearly labelled synthetic SSH-access scenario through detection,
+correlation, investigation, TTL-bounded containment, reporting, and closure.
+It is frontend-only: it does not insert database rows, contact a target, start
+the sensor, or change the host firewall. Demo progress is stored locally per
+signed-in user, and every synthetic metric and address is marked as simulated.
+
 ---
 
 ## 6. 🧩 Modules

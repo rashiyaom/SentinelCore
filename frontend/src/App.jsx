@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import Layout from "./layout/Layout";
@@ -23,6 +24,9 @@ import UsersPage from "./pages/admin/UsersPage";
 import NotificationsPage from "./pages/profile/NotificationsPage";
 import ReportsPage from "./pages/reports/ReportsPage";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import { FullPageSpinner } from "./components/Spinner";
+
+const DemoLabPage = lazy(() => import("./pages/demo/DemoLabPage"));
 
 /**
  * Route table. Role requirements mirror `layout/navigation.js` — an item
@@ -40,6 +44,14 @@ export default function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>
           <Route path="dashboard" element={<OverviewPage />} />
+          <Route
+            path="demo"
+            element={
+              <Suspense fallback={<FullPageSpinner label="Loading the guided demo" />}>
+                <DemoLabPage />
+              </Suspense>
+            }
+          />
 
           <Route path="profile/notifications" element={<NotificationsPage />} />
 

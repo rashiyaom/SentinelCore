@@ -4,6 +4,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 
 import clsx from "clsx";
 
+import OnboardingTour from "../components/OnboardingTour";
 import HealthDot from "./HealthDot";
 import PipelineIndicator from "./PipelineIndicator";
 import Sidebar from "./Sidebar";
@@ -37,6 +38,7 @@ export default function Layout() {
 
   return (
     <div className="app-surface min-h-screen text-slate-100">
+      <OnboardingTour />
       <Sidebar
         collapsed={collapsed}
         mobileOpen={mobileOpen}

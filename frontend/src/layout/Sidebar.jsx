@@ -4,6 +4,7 @@ import { NavLink } from "react-router-dom";
 import clsx from "clsx";
 
 import { useAuth } from "../auth/AuthContext";
+import { useDemo } from "../demo/DemoContext";
 import { NAV_GROUPS } from "./navigation";
 
 function NavItem({ item, collapsed, onNavigate }) {
@@ -32,6 +33,7 @@ function NavItem({ item, collapsed, onNavigate }) {
 
 export default function Sidebar({ collapsed, mobileOpen, onCloseMobile }) {
   const { hasRole } = useAuth();
+  const { openTour } = useDemo();
 
   // Items the role cannot reach are removed entirely, not disabled — a
   // disabled control still advertises that the capability exists.
@@ -90,15 +92,15 @@ export default function Sidebar({ collapsed, mobileOpen, onCloseMobile }) {
       </nav>
 
       {!collapsed && (
-        <div className="m-3 border border-white/10 bg-white/[0.025] p-3">
+        <button type="button" onClick={openTour} className="m-3 border border-white/10 bg-white/[0.025] p-3 text-left transition hover:border-violet-400/25 hover:bg-violet-400/[0.05]">
           <div className="flex items-start gap-2.5">
             <CircleHelp size={15} className="mt-0.5 shrink-0 text-violet-300" />
             <div>
               <p className="text-xs font-medium text-slate-300">New to SentinelCore?</p>
-              <p className="mt-1 text-[10px] leading-4 text-slate-600">Start on Overview. It will point you to the next action.</p>
+              <p className="mt-1 text-[10px] leading-4 text-slate-600">Open the project guide and learn the complete investigation workflow.</p>
             </div>
           </div>
-        </div>
+        </button>
       )}
     </>
   );

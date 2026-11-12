@@ -1,0 +1,26 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Arial','fontSize':'20px','primaryColor':'#eaf4fb','primaryTextColor':'#102a43','primaryBorderColor':'#3674a2','lineColor':'#617d91','secondaryColor':'#f6f9fc','tertiaryColor':'#ffffff','clusterBkg':'#f6f9fc','clusterBorder':'#cbd9e5'},'flowchart':{'curve':'linear','nodeSpacing':32,'rankSpacing':40,'padding':15}}}%%
+flowchart LR
+  subgraph DET["DETECTION AND EVIDENCE"]
+    direction LR
+    NET["Mirrored<br/>network traffic"] --> SUR["Suricata sensor<br/>signature detection"]
+    SUR -->|"EVE JSON"| PIPE["Pipeline worker<br/>normalize + deduplicate"]
+    PIPE --> REDIS["Redis stream<br/>worker coordination"] --> DB[("PostgreSQL<br/>partitioned events")]
+    DB --> COR["Correlation engine<br/>threshold · sequence<br/>rare · beacon"]
+    COR --> INC["Candidates and incidents<br/>linked evidence"]
+  end
+  subgraph CTRL["ANALYST AND CONTROL PLANE"]
+    direction LR
+    USER["Analyst browser<br/>React interface"] --> API["Nginx + FastAPI<br/>RBAC · audit"]
+    API --> DB
+    API -->|"validated Unix socket"| HELP["Privileged helper<br/>narrow operations"]
+    HELP --> ACT["Nmap · sensor control<br/>TTL firewall"]
+    PCAP["PCAP upload"] --> PARSE["Unprivileged parser<br/>tshark + limits"]
+    PARSE --> API
+  end
+  INC --> API
+  classDef sensor fill:#dcedf8,stroke:#2474a6,color:#102a43,stroke-width:2px;
+  classDef core fill:#163f5d,stroke:#163f5d,color:#ffffff,stroke-width:2px;
+  classDef guard fill:#fff2db,stroke:#d59227,color:#573c10,stroke-width:2px;
+  class SUR,PIPE,REDIS,COR sensor;
+  class DB,API,INC core;
+  class HELP,ACT guard;

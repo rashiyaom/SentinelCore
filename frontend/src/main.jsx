@@ -6,6 +6,7 @@ import App from "./App.jsx";
 import { AuthProvider } from "./auth/AuthContext";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ToastProvider } from "./components/Toast";
+import { DemoProvider } from "./demo/DemoContext";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -15,9 +16,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <ErrorBoundary>
       <BrowserRouter>
         <AuthProvider>
-          <ToastProvider>
-            <App />
-          </ToastProvider>
+          <DemoProvider>
+            <ToastProvider>
+              <App />
+            </ToastProvider>
+          </DemoProvider>
         </AuthProvider>
       </BrowserRouter>
     </ErrorBoundary>
